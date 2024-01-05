@@ -47,7 +47,7 @@ structures = os.listdir(dataset_dir)
 for struct in structures:
     configs_dict.update({struct: {"identifier": []}})
     subdir = dataset_dir / struct
-    if os.path.isdir(os.listdir(subdir)[0]):
+    if os.path.isdir(subdir / os.listdir(subdir)[0]):
         # The configurations are stored inside the subsubdirectory
         substructures = os.listdir(subdir)
         for substruct in substructures:
