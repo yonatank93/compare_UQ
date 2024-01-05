@@ -1,9 +1,23 @@
-# Cache
-*~
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Python
+# Jupyter Notebook
 .ipynb_checkpoints
-__pycache__
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # WIP
 data/
@@ -17,3 +31,14 @@ neuralnetwork/Si
 *random_init
 *metadata
 *models
+
+# Editor backup files
+*~
+.idea/
+.vscode/
+.*.sw?
+
+# Log files
+*.log
+log.*
+lammps.in
