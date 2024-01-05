@@ -4,9 +4,19 @@ uses different model sample from dropout ensemble.
 """
 
 from pathlib import Path
+import json
 from tqdm import tqdm
 import jinja2
 import subprocess
+
+# Read setting file
+WORK_DIR = Path(__file__).absolute().parent
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+
 
 sbatch_template = """#!/bin/bash
 
@@ -43,7 +53,7 @@ echo "All Done!"
 
 
 for idx in tqdm(range(100)):
-    outdir = Path(f"results/fim/{idx:03d}/virial_stress")
+    outdir = Path(RES_DIR / f"{idx:03d}" / "virial_stress")
     if not outdir.exists():
         outdir.mkdir(parents=True)
     # Render lammps command

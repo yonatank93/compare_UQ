@@ -4,20 +4,25 @@ model.
 """
 
 from pathlib import Path
+import json
 import re
 import jinja2
 import os
 import sys
 from tqdm import tqdm
-from glob import glob
-import pickle
 from multiprocessing import Pool
 
 import numpy as np
 from lammps import lammps
 from ase.units import create_units
 
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
 RES_DIR = WORK_DIR / "results" / "fim"
 
 u = create_units("2018")
@@ -122,9 +127,7 @@ def write_lammps_command(modelname, a, dumppath):
     return lammps_command
 
 
-def run_one_latparam(
-    modelname, a, dumppath, cmdargs=["-screen", os.devnull, "-nocite"]
-):
+def run_one_latparam(modelname, a, dumppath, cmdargs=["-screen", os.devnull, "-nocite"]):
     """Run MD simulation for virial stress calculation for a given single lattice
     parameter. For the arguments of this function, they are mostly the same as the
     arguments for ``write_lammps_command``.

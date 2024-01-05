@@ -11,8 +11,8 @@
 
 
 from pathlib import Path
+import json
 import os
-from glob import glob
 import pickle
 from tqdm import tqdm
 
@@ -25,8 +25,16 @@ from ase.calculators.kim import KIM
 # get_ipython().run_line_magic('matplotlib', 'inline')
 plt.style.use("default")
 
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
-RES_DIR = WORK_DIR / "results" / "fim"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+if not RES_DIR.exists():
+    RES_DIR.mkdir(parents=True)
 
 
 # # Get the reference energy data
@@ -37,12 +45,12 @@ RES_DIR = WORK_DIR / "results" / "fim"
 # Get all test configurations
 configs_dict = {}
 
-dataset_dir = WORK_DIR.parent / "carbon_test_set"
+dataset_dir = PART_DIR / "carbon_test_set"
 structures = os.listdir(dataset_dir)
 for struct in structures:
     configs_dict.update({struct: {"identifier": []}})
     subdir = dataset_dir / struct
-    if os.path.isdir(os.listdir(subdir)[0]):
+    if os.path.isdir(subdir / os.listdir(subdir)[0]):
         # The configurations are stored inside the subsubdirectory
         substructures = os.listdir(subdir)
         for substruct in substructures:
