@@ -3,13 +3,12 @@
 #Submit this script with: sbatch thefilename
 
 #SBATCH --time=165:00:00   # walltime
-#SBATCH --ntasks=4   # number of processor cores
+#SBATCH --ntasks=2   # number of processor cores
 #SBATCH --nodes=1   # number of nodes
-#SBATCH --mem-per-cpu=10G   # memory per CPU core
-#SBATCH --job-name=DUNN_train   # job name
+#SBATCH --mem-per-cpu=20G   # memory per CPU core
+#SBATCH --job-name=DUNN_loss_epochs_test   # job name
 #SBATCH --mail-user=kurniawanyo@outlook.com   # email address
 #SBATCH --mail-type=FAIL
-#SBATCH -o ./results/loss/train_loss_1.out # STDOUT
 
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
@@ -26,6 +25,6 @@ export NUM_CORES=${SLURM_NTASKS}
 echo "Running ${SLURM_JOB_NAME}"
 echo "Running on ${NUM_CORES} cores"
 
-python initial_training.py
+python training_loss_evaluate_loss.py test
 
 echo "All Done!"

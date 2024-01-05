@@ -1,22 +1,21 @@
 """Look at how the loss evolves with the number of epochs."""
 
 from pathlib import Path
+import json
 import re
 from tqdm import tqdm
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-from kliff.models import KIMModel
-from kliff.calculators import Calculator
-from kliff.dataset import Dataset
-from kliff.dataset.weight import Weight
-from kliff.loss import Loss
 
-
+# Settings and Directories
 WORK_DIR = Path(__file__).absolute().parent
-SFILE_DIR = WORK_DIR / "slurm_files"
-RES_DIR = WORK_DIR / "results" / "loss"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition"
 
 # Setup regular expression search numbers
 numeric_const_pattern = r"""
