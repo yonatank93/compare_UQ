@@ -1,0 +1,19 @@
+# Cache
+*~
+
+# Python
+.ipynb_checkpoints
+__pycache__
+
+# WIP
+data/
+empirical/
+neuralnetwork/Si
+
+# Large files
+*archive
+*fingerprints
+*results
+*random_init
+*metadata
+*models

@@ -1,0 +1,56 @@
+################################################################################
+# Compute the energy of a monolayer graphene with a lattice parameter of a=2.466
+# Angstrom. Periodic boundary conditions are applied in the two in-plane
+# directions, while the out-of-plane direction is free.
+#
+# The energy is computed using the DUNN potential with 100 ensemble members
+# (each with different dropout matrices). The mean and standard deviation of
+# the energy are reported.
+################################################################################
+
+# Initialize interatomic potential (KIM model) and units
+atom_style	atomic
+kim init	DUNN_best_train metal
+# boundary conditions
+boundary	p p f
+# create a honeycomb lattice
+variable	a equal 2.6352392681250008
+lattice		custom $a a1 1.0 0.0 0.0 &
+			  a2 0.5 $(sqrt(3.0)/2.0) 0.0 &
+			  a3 0.0 0.0 1.0 &
+			  basis 0.0 0.0 0.0 &
+			  basis $(1.0/3.0) $(1.0/3.0) 0.0 &
+			  spacing 1.0 $(sqrt(3.0)/2.0) 1.0
+# create simulation box and atoms
+region		reg prism 0 1 0 1 0 1 0.5 0 0 units lattice
+create_box	1 reg
+create_atoms	1 box
+mass		1 12
+# specify atom type to chemical species mapping for the KIM model
+kim interactions C
+# get model ensemble size
+kim param	get ensemble_size 1 size
+# loop over model ensemble member to compute energy sum and energy square sum
+variable	natoms equal 2
+variable	E_sum equal 0
+variable	Esq_sum equal 0
+variable	id loop ${size}
+label		LP
+kim param	set active_member_id 1 ${id}
+run		0
+variable	E equal pe/${natoms}
+variable	E_sum equal ${E_sum}+${E}
+variable	Esq_sum equal ${Esq_sum}+${E}^2
+next		id
+jump		SELF LP
+# compute mean energy and the standard deviation
+variable	E_mean equal ${E_sum}/${size}
+variable	Esq_mean equal ${Esq_sum}/${size}
+variable	E_stdev equal sqrt(${Esq_mean}-${E_mean}^2)
+# # print results
+# print		"================================================================================"
+# print		"Energy of a monolayer graphene."
+# print		"Ensemble size: ${size}"
+# print		"Mean energy: ${E_mean} eV/atom"
+# print		"Standard deviation of energy: ${E_stdev} eV/atom"
+# print		"================================================================================"

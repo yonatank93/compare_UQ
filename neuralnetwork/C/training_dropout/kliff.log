@@ -1,0 +1,16 @@
+2024-01-04 15:33:47.456 | INFO     | kliff.dataset.dataset:_read:398 - 4309 configurations read from /data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/carbon_training_set
+2024-01-04 15:33:47.460 | INFO     | kliff.calculators.calculator_torch:_get_device:592 - Training on cpu
+2024-01-04 15:33:47.462 | INFO     | kliff.calculators.calculator_torch:create:93 - Reuse fingerprints `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/fingerprints/fingerprints_train.pkl`
+2024-01-04 15:33:47.469 | INFO     | kliff.calculators.calculator_torch:create:111 - Reuse fingerprints mean and stdev `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/fingerprints/fingerprints_train_mean_and_stdev.pkl`
+2024-01-04 15:35:27.419 | INFO     | kliff.dataset.dataset:_read:398 - 4309 configurations read from /data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/carbon_training_set
+2024-01-04 15:35:27.421 | INFO     | kliff.calculators.calculator_torch:_get_device:592 - Training on cpu
+2024-01-04 15:35:27.422 | INFO     | kliff.calculators.calculator_torch:create:93 - Reuse fingerprints `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/fingerprints/fingerprints_train.pkl`
+2024-01-04 15:35:27.423 | INFO     | kliff.calculators.calculator_torch:create:111 - Reuse fingerprints mean and stdev `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/fingerprints/fingerprints_train_mean_and_stdev.pkl`
+2024-01-04 15:35:36.015 | INFO     | kliff.models.model_torch:load:117 - Model loaded from `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/models/initial_training/final_model_dropout_epochs39030.pkl`
+2024-01-04 15:35:36.687 | INFO     | kliff.models.neural_network:write_kim_model:121 - KLIFF trained model written to /data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/DUNN_best_train.
+2024-01-04 15:36:50.998 | INFO     | kliff.dataset.dataset:_read:398 - 479 configurations read from /data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/carbon_test_set
+2024-01-04 15:36:50.999 | INFO     | kliff.calculators.calculator_torch:_get_device:592 - Training on cpu
+2024-01-04 15:36:51.000 | INFO     | kliff.calculators.calculator_torch:create:93 - Reuse fingerprints `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/fingerprints/fingerprints_test.pkl`
+2024-01-04 15:36:51.005 | INFO     | kliff.calculators.calculator_torch:create:111 - Reuse fingerprints mean and stdev `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/fingerprints/fingerprints_test_mean_and_stdev.pkl`
+2024-01-04 15:36:59.458 | INFO     | kliff.models.model_torch:load:117 - Model loaded from `/data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/models/initial_training/final_model_dropout_epochs36290.pkl`
+2024-01-04 15:37:00.137 | INFO     | kliff.models.neural_network:write_kim_model:121 - KLIFF trained model written to /data/yonatan/myproject/scripts/compare_UQ/neuralnetwork/C/training_dropout/DUNN_best_test.

@@ -1,0 +1,36 @@
+2024-01-04:17:06:51MST * 0 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:110 * Log object created.  Default verbosity level is 'information'.
+2024-01-04:17:06:51MST * 1 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0_Collections'.
+2024-01-04:17:06:51MST * 2 * information * 0_Collections * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0x563f117a1320'.
+2024-01-04:17:06:51MST * 3 * information * 0_Collections * KIM_LogImplementation.cpp:120 * Log object destroyed.
+2024-01-04:17:06:51MST * 0 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:110 * Log object created.  Default verbosity level is 'information'.
+2024-01-04:17:06:51MST * 0 * information * 0x563f11768c80 * KIM_LogImplementation.cpp:110 * Log object created.  Default verbosity level is 'information'.
+2024-01-04:17:06:51MST * 1 * information * 0x563f11768c80 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0x563f117a1320_Collections'.
+2024-01-04:17:06:51MST * 2 * information * 0x563f117a1320_Collections * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0x563f11768c80'.
+2024-01-04:17:06:51MST * 1 * warning * 0x563f117a1320 * KIM_ModelImplementation.cpp:874 * Use of the GetParameterFileName(0, 0x7fff2263e008). function is deprecated. Please use GetParameterFileBasename() instead.
+2024-01-04:17:06:51MST * 2 * warning * 0x563f117a1320 * KIM_ModelImplementation.cpp:874 * Use of the GetParameterFileName(1, 0x7fff2263e008). function is deprecated. Please use GetParameterFileBasename() instead.
+2024-01-04:17:06:51MST * 3 * warning * 0x563f117a1320 * KIM_ModelImplementation.cpp:874 * Use of the GetParameterFileName(2, 0x7fff2263e008). function is deprecated. Please use GetParameterFileBasename() instead.
+2024-01-04:17:06:51MST * 4 * error * 0x563f117a1320 * KIM_SharedLibrary.cpp:348 * SharedLibrary not open.
+2024-01-04:17:06:51MST * 3 * information * 0x563f117a1320_Collections * KIM_LogImplementation.cpp:120 * Log object destroyed.
+2024-01-04:17:06:51MST * 5 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0_Model'.
+2024-01-04:17:06:51MST * 6 * information * 0_Model * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0x563f117a1320'.
+2024-01-04:17:06:51MST * 7 * information * 0_Model * KIM_LogImplementation.cpp:120 * Log object destroyed.
+2024-01-04:17:06:51MST * 0 * information * 0x563f1177bf30 * KIM_LogImplementation.cpp:110 * Log object created.  Default verbosity level is 'information'.
+2024-01-04:17:06:51MST * 0 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:110 * Log object created.  Default verbosity level is 'information'.
+2024-01-04:17:06:51MST * 1 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0x563f1177bf30_Collections'.
+2024-01-04:17:06:51MST * 2 * information * 0x563f1177bf30_Collections * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0x563f117a1320'.
+2024-01-04:17:06:51MST * 1 * warning * 0x563f1177bf30 * KIM_ModelImplementation.cpp:874 * Use of the GetParameterFileName(0, 0x7fff2263dd18). function is deprecated. Please use GetParameterFileBasename() instead.
+2024-01-04:17:06:51MST * 2 * warning * 0x563f1177bf30 * KIM_ModelImplementation.cpp:874 * Use of the GetParameterFileName(1, 0x7fff2263dd18). function is deprecated. Please use GetParameterFileBasename() instead.
+2024-01-04:17:06:51MST * 3 * warning * 0x563f1177bf30 * KIM_ModelImplementation.cpp:874 * Use of the GetParameterFileName(2, 0x7fff2263dd18). function is deprecated. Please use GetParameterFileBasename() instead.
+2024-01-04:17:06:51MST * 4 * error * 0x563f1177bf30 * KIM_SharedLibrary.cpp:348 * SharedLibrary not open.
+2024-01-04:17:06:51MST * 3 * information * 0x563f1177bf30_Collections * KIM_LogImplementation.cpp:120 * Log object destroyed.
+2024-01-04:17:06:51MST * 5 * information * 0x563f1177bf30 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0_Model'.
+2024-01-04:17:06:51MST * 6 * information * 0_Model * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0x563f1177bf30'.
+2024-01-04:17:06:51MST * 0 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:110 * Log object created.  Default verbosity level is 'information'.
+2024-01-04:17:06:51MST * 1 * information * 0x563f117a1320 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0_Model_0x563f117a1320'.
+2024-01-04:17:06:51MST * 2 * information * 0_Model_0x563f117a1320 * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0x563f117a1320'.
+2024-01-04:17:06:51MST * 3 * information * 0_Model_0x563f117a1320 * ANNImplementation.cpp:475 * Register argument supportStatus
+2024-01-04:17:06:51MST * 4 * information * 0_Model_0x563f117a1320 * ANNImplementation.cpp:494 * Register callback supportStatus
+2024-01-04:17:06:51MST * 5 * information * 0_Model_0x563f117a1320 * KIM_LogImplementation.cpp:242 * Log object renamed.  ID changed to '0_ComputeArguments'.
+2024-01-04:17:06:51MST * 6 * information * 0_ComputeArguments * KIM_LogImplementation.cpp:246 * Log object renamed.  ID changed from '0_Model_0x563f117a1320'.
+2024-01-04:17:06:52MST * 0 * information * 0_ComputeArguments * KIM_LogImplementation.cpp:120 * Log object destroyed.
+2024-01-04:17:06:52MST * 0 * information * 0_Model * KIM_LogImplementation.cpp:120 * Log object destroyed.
