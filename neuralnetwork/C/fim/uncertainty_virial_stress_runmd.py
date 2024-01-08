@@ -23,7 +23,7 @@ with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
 PART_DIR = ROOT_DIR / f"{partition}_partition_data"
-RES_DIR = WORK_DIR / "results" / "fim"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
 
 u = create_units("2018")
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     alist = np.linspace(0.95, 1.05, 11) * 2.466
     idx = int(argv[1]) if len(argv) > 1 else 0
     modelname = f"DUNN_C_fimbayes_{idx:03d}"
-    path = Path(f"results/fim/{idx:03d}/virial_stress")
+    path = RES_DIR / f"{idx:03d}" / "virial_stress"
 
     def run_md_one_latparam_wrapper(a):
         return run_md_one_latparam(a, modelname, path)

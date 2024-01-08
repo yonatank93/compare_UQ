@@ -53,7 +53,7 @@ echo "All Done!"
 
 
 for idx in tqdm(range(100)):
-    outdir = Path(RES_DIR / f"{idx:03d}" / "virial_stress")
+    outdir = RES_DIR / f"{idx:03d}" / "virial_stress"
     if not outdir.exists():
         outdir.mkdir(parents=True)
     # Render lammps command

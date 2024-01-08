@@ -33,8 +33,6 @@ with open(ROOT_DIR / "settings.json", "r") as f:
 partition = settings["partition"]
 PART_DIR = ROOT_DIR / f"{partition}_partition_data"
 RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
-if not RES_DIR.exists():
-    RES_DIR.mkdir(parents=True)
 
 
 # # Get the reference energy data
