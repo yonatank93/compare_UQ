@@ -41,10 +41,17 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 argv = sys.argv
 set_idx = int(argv[1])
 
-# Directories
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
-FP_DIR = WORK_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / "bootstrap" / f"{set_idx:03d}"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+
+# Directories
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+FP_DIR = PART_DIR / "fingerprints"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
 if not RES_DIR.exists():
     RES_DIR.mkdir()
 MODEL_DIR = RES_DIR / "models"
@@ -115,7 +122,7 @@ for layer in layers:
 # ---------------------------
 
 # training set
-dataset_path = WORK_DIR / "carbon_training_set"
+dataset_path = PART_DIR / "carbon_training_set"
 weight = Weight(energy_weight=1.0, forces_weight=np.sqrt(0.1))
 tset = Dataset(dataset_path, weight)
 configs = tset.get_configs()
@@ -143,7 +150,7 @@ loss = Loss(calc, residual_data=residual_data)
 # Load the bootstrap configurations
 BS = BootstrapNeuralNetworkModel(loss, seed=seed)
 bootstrap_fingerprints = BS.load_bootstrap_compute_arguments(
-    WORK_DIR / "bootstrap_fingerprints.json"
+    WORK_DIR / f"bootstrap_fingerprints_{partition}.json"
 )
 calc.set_fingerprints(BS.bootstrap_compute_arguments[set_idx])
 

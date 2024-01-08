@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import numpy as np
 import torch
@@ -23,9 +24,17 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 # Initial Setup
 # -------------
 
-# Directories
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
-FP_DIR = WORK_DIR / "fingerprints"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+
+# Directories
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+FP_DIR = PART_DIR / "fingerprints"
+
 
 # Architecture
 Nlayers = 4  # Number of layers, excluding input layer, including outpt layer
@@ -64,17 +73,6 @@ model.add_layers(
     nn.Linear(Nnodes, 1),
     # output layer
 )
-# In Mingjian's original script, the initial values of the weights were generated using
-# xavier normal function, while the bias were set to zero initially. However, pytorch
-# default initialization uses different functions, unless if we specify them after we
-# initialize the layers. That is exactly what I want to try here.
-layers = model.layers
-for layer in layers:
-    if isinstance(layer, nn.Linear):
-        # Initialize the weights using xavier normal
-        nn.init.xavier_normal_(layer.weight)
-        # Initialize the biases as zeros
-        nn.init.zeros_(layer.bias)
 
 
 ##########################################################################################
@@ -82,7 +80,7 @@ for layer in layers:
 # ---------------------------
 
 # training set
-dataset_path = WORK_DIR / "carbon_training_set"
+dataset_path = PART_DIR / "carbon_training_set"
 weight = Weight(energy_weight=1.0, forces_weight=np.sqrt(0.1))
 tset = Dataset(dataset_path, weight)
 configs = tset.get_configs()
@@ -116,7 +114,7 @@ BS = BootstrapNeuralNetworkModel(loss, seed=seed)
 # Try to load the data from previous calculations
 # Bootstrap compute arguments samples
 nsamples_target = 100
-bootstrap_fingerprints_file = Path("bootstrap_fingerprints.json")
+bootstrap_fingerprints_file = Path(f"bootstrap_fingerprints_{partition}.json")
 if bootstrap_fingerprints_file.exists():
     BS.load_bootstrap_compute_arguments(bootstrap_fingerprints_file)
 else:

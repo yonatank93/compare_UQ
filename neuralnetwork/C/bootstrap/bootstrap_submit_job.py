@@ -1,16 +1,25 @@
 from pathlib import Path
+import json
 import jinja2
 import subprocess
 
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
-RES_DIR = WORK_DIR / "results" / "bootstrap"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+
+# Directories
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition"
 
 
 slurm_tpl = """#!/bin/bash
 
 #Submit this script with: sbatch thefilename
 
-#SBATCH --time=70:00:00   # walltime
+#SBATCH --time=165:00:00   # walltime
 #SBATCH --ntasks=1   # number of processor cores
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --mem-per-cpu=20G   # memory per CPU core
@@ -18,7 +27,7 @@ slurm_tpl = """#!/bin/bash
 #SBATCH --job-name=DUNN_bootstrap_{{ idx_str }}   # job name
 #SBATCH --mail-user=kurniawanyo@outlook.com   # email address
 #SBATCH --mail-type=FAIL
-#SBATCH -o ./results/bootstrap/{{ idx_str }}/train_loss_3.out # STDOUT
+#SBATCH -o ./results/{{ partition_dir }}/{{ idx_str }}/train_loss.out # STDOUT
 
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
@@ -43,7 +52,7 @@ echo "All Done!"
 
 env = jinja2.Environment()
 template = env.from_string(slurm_tpl)
-fname = "submit_job_bootstrap.sh"
+fname = RES_DIR / "submit_job_bootstrap.sh"
 
 nsamples = 100
 for ii in range(nsamples):
@@ -52,9 +61,11 @@ for ii in range(nsamples):
     if not SAMPLE_DIR.exists():
         SAMPLE_DIR.mkdir(parents=True)
     # Render
-    content = template.render(set_idx=ii, idx_str=SAMPLE_DIR.name)
+    content = template.render(
+        set_idx=ii, idx_str=SAMPLE_DIR.name, partition_dir=f"{partition}_partition"
+    )
     # Write sbatch file
     with open(fname, "w") as f:
         f.write(content)
     # Submit job
-    subprocess.run(["sbatch", fname])
+    subprocess.run(["sbatch", str(fname)])

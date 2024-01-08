@@ -6,6 +6,7 @@ use fully connected model.
 
 ##########################################################################################
 from pathlib import Path
+import json
 import sys
 import subprocess
 
@@ -15,7 +16,6 @@ import torch
 from kliff import nn
 from kliff.calculators import CalculatorTorch
 from kliff.dataset import Dataset
-from kliff.dataset.weight import Weight
 from kliff.descriptors import SymmetryFunction
 from kliff.models import NeuralNetwork
 
@@ -38,9 +38,19 @@ else:
 # Initial Setup
 # -------------
 
-# Directories
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
-FP_DIR = WORK_DIR.parent / "fingerprints"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+
+# Directories
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+FP_DIR = PART_DIR / "fingerprints"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+if not RES_DIR.exists():
+    RES_DIR.mkdir()
 
 # Architecture
 Nlayers = 4  # Number of layers, excluding input layer, including outpt layer
@@ -80,7 +90,7 @@ model.add_layers(
 # ---------------------------
 
 # training set
-dataset_path = WORK_DIR.parent / "carbon_training_set"
+dataset_path = PART_DIR / "carbon_training_set"
 tset = Dataset(dataset_path)
 configs = tset.get_configs()
 
@@ -100,16 +110,16 @@ _ = calc.create(
 # Write KIM model
 # ---------------
 for set_idx in range(100):
-    RES_DIR = WORK_DIR / "results" / "bootstrap" / f"{set_idx:03d}"
+    SAMPLE_DIR = RES_DIR / f"{set_idx:03d}"
 
     # Load last parameters
-    last_param_file = RES_DIR / "last_params.npy"
+    last_param_file = SAMPLE_DIR / "last_params.npy"
     if last_param_file.exists():
         last_params = np.load(last_param_file)
         calc.update_model_params(last_params)
         # Write model
         modelname = f"DUNN_C_bootstrap_{set_idx:03d}"
-        model.write_kim_model(RES_DIR / modelname)
+        model.write_kim_model(SAMPLE_DIR / modelname)
 
         if mode == "install":
             # Install
@@ -118,7 +128,7 @@ for set_idx in range(100):
                     "kim-api-collections-management",
                     "install",
                     "user",
-                    RES_DIR / modelname,
+                    SAMPLE_DIR / modelname,
                 ]
             )
         elif mode == "uninstall":
