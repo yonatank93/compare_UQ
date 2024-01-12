@@ -12,7 +12,7 @@ partition = settings["partition"]
 
 # Directories
 PART_DIR = ROOT_DIR / f"{partition}_partition_data"
-RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
 
 
 slurm_tpl = """#!/bin/bash

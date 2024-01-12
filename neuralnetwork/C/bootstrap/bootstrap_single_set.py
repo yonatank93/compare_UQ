@@ -31,7 +31,7 @@ from kliff.uq import BootstrapNeuralNetworkModel
 seed = 1
 np.random.seed(seed)
 torch.manual_seed(seed)
-torch.set_default_tensor_type(torch.DoubleTensor)
+# torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 ##########################################################################################
@@ -209,7 +209,7 @@ if start_epoch < epoch_change_lr:
 if start_epoch < nepochs_total:
     # After that, we continue training using lr=1e-4
     num_epochs = nepochs_total - start_epoch
-    learning_rate *= 0.01
+    learning_rate *= 0.1
     minimize_setting.update(
         dict(start_epoch=start_epoch, num_epochs=num_epochs, lr=learning_rate)
     )
