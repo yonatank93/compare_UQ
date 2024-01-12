@@ -16,7 +16,7 @@ sbatch_template = """#!/bin/bash
 #SBATCH --ntasks=11   # number of processor cores
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --mem-per-cpu=2G   # memory per CPU core
-#SBATCH --job-name=virial_fim_{{ idx }}   # job name
+#SBATCH --job-name=virial_randinit_{{ idx }}   # job name
 #SBATCH --mail-user=kurniawanyo@outlook.com   # email address
 #SBATCH --mail-type=FAIL
 #SBATCH -o {{ outfile }} # STDOUT
