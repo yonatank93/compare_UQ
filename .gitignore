@@ -39,6 +39,7 @@ neuralnetwork/Si
 .*.sw?
 
 # Log files
-*.log
-log.*
+kim.log
+kliff.log
+log.lammps
 lammps.in
