@@ -4,21 +4,26 @@ model.
 """
 
 from pathlib import Path
+import json
 import re
 import jinja2
 import os
 import sys
 from tqdm import tqdm
-from glob import glob
-import pickle
 from multiprocessing import Pool
 
 import numpy as np
 from lammps import lammps
 from ase.units import create_units
 
+# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
-RES_DIR = WORK_DIR / "results" / "fim"
+ROOT_DIR = WORK_DIR.parent
+with open(ROOT_DIR / "settings.json", "r") as f:
+    settings = json.load(f)
+partition = settings["partition"]
+PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
 
 u = create_units("2018")
 
@@ -75,7 +80,7 @@ fix		mylgv all langevin 0.0 ${temp} 0.01 2023
 
 thermo		100
 thermo_style	custom step temp etotal press lx ly lz
-run		1000
+run		10000
 unfix           mylgv
 
 # Start recording the data
@@ -90,7 +95,7 @@ fix		mylgv all langevin ${temp} ${temp} 0.1 2023
 reset_timestep	0
 thermo		10
 thermo_style	custom step temp etotal press lx ly lz c_virial[*]
-run		1000
+run		10000
 
 undump		mydump
 """
@@ -198,8 +203,8 @@ if __name__ == "__main__":
 
     alist = np.linspace(0.95, 1.05, 11) * 2.466
     idx = int(argv[1]) if len(argv) > 1 else 0
-    modelname = f"DUNN_C_fimbayes_{idx:03d}"
-    path = Path(f"results/fim/{idx:03d}/virial_stress")
+    modelname = f"DUNN_C_randinit_{idx:03d}"
+    path = RES_DIR / f"{idx:03d}" / "virial_stress"
 
     def run_md_one_latparam_wrapper(a):
         return run_md_one_latparam(a, modelname, path)

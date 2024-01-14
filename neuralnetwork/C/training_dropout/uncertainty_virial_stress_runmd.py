@@ -81,7 +81,7 @@ fix		mylgv all langevin 0.0 ${temp} 0.01 2023
 
 thermo		100
 thermo_style	custom step temp etotal press lx ly lz
-run		1000
+run		10000
 unfix           mylgv
 
 # Start recording the data
@@ -96,7 +96,7 @@ fix		mylgv all langevin ${temp} ${temp} 0.1 2023
 reset_timestep	0
 thermo		10
 thermo_style	custom step temp etotal press lx ly lz c_virial[*]
-run		1000
+run		10000
 
 undump		mydump
 """
