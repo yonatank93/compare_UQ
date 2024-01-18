@@ -20,7 +20,7 @@ env.bak/
 venv.bak/
 
 # WIP
-data/
+data
 empirical/
 neuralnetwork/Si
 
