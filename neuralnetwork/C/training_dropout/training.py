@@ -38,12 +38,13 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 # Read setting file
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
+DATA_DIR = ROOT_DIR / "data"
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
 
 # Directories
-PART_DIR = ROOT_DIR / f"{partition}_partition_data"
+PART_DIR = DATA_DIR / f"{partition}_partition_data"
 FP_DIR = PART_DIR / "fingerprints"
 RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition"
 if not RES_DIR.exists():
