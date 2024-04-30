@@ -21,6 +21,7 @@ venv.bak/
 
 # Markdown
 .markdown-preview.html
+README.html
 
 # WIP
 /data/

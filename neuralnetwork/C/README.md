@@ -35,6 +35,11 @@ The results for each method are stored in separate folders.
 * [bootstrap](https://github.com/yonatank93/compare_UQ/tree/main/neuralnetwork/C/bootstrap) contains routines to generate bootstrap dataset and propagate the uncertainty from the ensemble.
 
 
+## Requirements
+Most of the Python dependencies are listed in `requirements.txt`.
+Other dependencies, such as LAMMPS and KIM-API, need to be installed manually.
+
+
 ## How to use
 
 1. First, open [settings.json](https://github.com/yonatank93/compare_UQ/blob/main/neuralnetwork/C/settings.json) and decide whether to use "mingjian" or "yonatan" partition.
