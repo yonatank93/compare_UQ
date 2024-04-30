@@ -11,7 +11,11 @@ Additionally, we also obtain a dropout ensemble, which is streamed line through 
 * Architecture:
 	* Input layer with 51 nodes
 	* 3 linear hidden layers with tanh activation function and dropout ratio 0.1, each having 128 nodes.
-	
+* Dataset:
+	* Containing various carbon structures, as described in [Wen and Tadmor (2020)](https://doi.org/10.1038/s41524-020-00390-8).
+	* The training energy and forces are normalized by the number of atoms in the configuration.
+	* Additional weight of 0.1 is added to the forces data, as described in [Wen and Tadmor (2020)](https://doi.org/10.1038/s41524-020-00390-8).
+
 	
 ## Training details
 
