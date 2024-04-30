@@ -19,6 +19,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Markdown
+.markdown-preview.html
+
 # WIP
 /data/
 empirical/
