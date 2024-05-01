@@ -15,7 +15,8 @@ Then, to compare the uncertainty obtained using random intialization ensemble ag
    Thus, the end product is the entire ensemble.
 2. Follow the calculation by installing the KIM model members of the emsemble using `python randinit_install_uninstall.py install` command.
 3. Then, to reduce the number of files produce, e.g., if there is a limit of file count, run `python randinit_archive_saved_models.py`.
-   This will combine and archive the model ensembles, including the saved models exported during the training, into a single `tar.gz` file.
+   This will combine and aarchive the saved models exported during the training for each ensemble.
+   Running this command will create a file named `results/<partition>_partition/<ensemble_id>/models/models.tar.gz`, where `ensemble_id` is a number from 000 to 099.
 4. Uncertainty of the configuration energy per atom for the configurations in the test set.
    `uncertainty_accuracy_energies.ipynb` and `uncertainty_accuracy_energies.py` correspond to this calculation.
    The notebook has additional commands to plot the results.
