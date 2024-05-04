@@ -25,6 +25,8 @@ mass 1 12.011
 kim interactions C
 neighbor 2.0 bin 
 neigh_modify delay 10 check yes 
+# Set dropout active member
+kim param set active_member_id 1 {{ active_id }}
  
 # ---------- Define Settings --------------------- 
 compute eng all pe/atom 

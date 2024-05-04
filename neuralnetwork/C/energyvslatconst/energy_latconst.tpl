@@ -28,6 +28,7 @@ create_atoms	1 box
 mass		1 12
 # specify atom type to chemical species mapping for the KIM model
 kim interactions C
+kim param	set active_member_id 1 {{ set_id }}
 # compute energy
 run		0
 variable	natoms equal 2
