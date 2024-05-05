@@ -1,3 +1,3 @@
 from . import generate_graphene
-from .relaxation_latconst import equilibrate_graphene, equilibrate_graphene_dropout
+from .relaxation_latconst import equilibrate_graphene
 from .energyvslatconst import energyvslatconst

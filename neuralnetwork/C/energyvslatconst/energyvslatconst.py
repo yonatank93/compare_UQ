@@ -18,10 +18,13 @@ except ImportError:
 
 
 WORK_DIR = Path(__file__).absolute().parent
-template_file = "energy_latconst.tpl"
+# template_file = "energy_latconst.tpl"
+avail_struct = ["graphene", "diamond"]
 
 
-def energyvslatconst(potential, alist, active_member_id=0, lmpfile=None):
+def energyvslatconst(
+    potential, alist, structure="graphene", active_member_id=0, lmpfile=None
+):
     """Compute the energy vs lattice constant curve for given a list of lattice constant
     a. Additionally, a list of lattice constant b from the relaxation will be returned.
     The relaxation is done in LAMMPS.
@@ -32,6 +35,8 @@ def energyvslatconst(potential, alist, active_member_id=0, lmpfile=None):
         KIM ID for the potential to use.
     alist: np.ndarray
         A list of lattice constant, preferably in ascending order.
+    structure: str
+        Structure of the carbon material. It can only be "diamond" and "graphene".
     active_member_id: int
         Integer number that sets the active member in the ensemble. 0 means to not use
         dropout, -1 means to take the mean across all ensemble, and 1-100 correspond to
@@ -44,18 +49,28 @@ def energyvslatconst(potential, alist, active_member_id=0, lmpfile=None):
     eng_error: np.ndarray
         Standard deviations of the energy, calculated using dropout ensemble.
     """
+    # Get the correct lammps template
+    if structure == "graphene":
+        template_file = "energy_latconst.tpl"
+    elif structure == "diamond":
+        template_file = "energy_latconst_diamond.tpl"
+    else:
+        raise ValueError(f"Unknown structure, available structure: {avail_struct}")
+
     # Vary lattice constants
     predictions = np.empty((0, 3))
 
     for a in alist:
-        preds_a = energy_given_latconst(potential, a, active_member_id, lmpfile)
+        preds_a = energy_given_latconst(
+            potential, a, active_member_id, template_file, lmpfile
+        )
         # Append the result
         predictions = np.row_stack((predictions, preds_a))
 
     return predictions.T
 
 
-def energy_given_latconst(potential, a, active_member_id=0, lmpfile=None):
+def energy_given_latconst(potential, a, active_member_id, template_file, lmpfile=None):
     loader = jinja2.FileSystemLoader(WORK_DIR)
     environment = jinja2.Environment(loader=loader)
     tempfile = template_file
