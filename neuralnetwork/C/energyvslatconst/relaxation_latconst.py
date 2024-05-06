@@ -1,7 +1,6 @@
 from pathlib import Path
 import jinja2
 import os
-from tqdm import tqdm
 
 import numpy as np
 import lammps
@@ -12,8 +11,8 @@ except ImportError:
     from generate_graphene import generate_unit_cell
 
 WORK_DIR = Path(__file__).absolute().parent
-template_file = "relaxation.tpl"
-outfile = WORK_DIR / "relaxation.in"
+template_file_graphene = "relaxation_graphene.tpl"
+template_file_diamond = "relaxation_diamond.tpl"
 
 
 def equilibrate_graphene(potential, ainit, nx=1, ny=1, active_member_id=0, debug=False):
@@ -65,7 +64,7 @@ def equilibrate_graphene(potential, ainit, nx=1, ny=1, active_member_id=0, debug
     # Write input file
     loader = jinja2.FileSystemLoader(WORK_DIR)
     environment = jinja2.Environment(loader=loader)
-    template = environment.get_template(template_file)
+    template = environment.get_template(template_file_graphene)
     content = template.render(
         potential=potential,
         active_id=active_member_id,
@@ -74,6 +73,51 @@ def equilibrate_graphene(potential, ainit, nx=1, ny=1, active_member_id=0, debug
         pos=pos_str,
         nx=nx,
         ny=ny,
+    )
+
+    # Run lammps script
+    lmp = lammps.lammps(cmdargs=["-screen", os.devnull, "-nocite"])
+    lmp.commands_string(content)
+    a0 = lmp.extract_variable("length")  # Equilibrium lattice constant
+    e0 = lmp.extract_variable("ecoh")  # Equilibrium cohesive energy
+    lmp.close()
+
+    if debug:
+        return a0, e0, content
+    else:
+        return a0, e0
+
+
+def equilibrate_diamond(potential, ainit, active_member_id=0, debug=False):
+    """Relax a diamond structure and get the equilibrium lattice constant and cohesive
+    energy.
+
+    Parameters
+    ----------
+    potential: str
+        KIM ID for the potential to use.
+    ainit: float
+        Initial guess of lattice constant in angstrom.
+    active_member_id: int
+        Integer number that sets the active member in the ensemble. 0 means to not use
+        dropout, -1 means to take the mean across all ensemble, and 1-100 correspond to
+        each dropout ensemble member.
+    debug: bool (optional)
+        If True, then the generated lammps script will be returned as well.
+
+    Returns
+    -------
+    a0: float
+        Equilibrium lattice constant a in angstrom.
+    e0: float
+        Cohesive energy in eV.
+    """
+    # Write input file
+    loader = jinja2.FileSystemLoader(WORK_DIR)
+    environment = jinja2.Environment(loader=loader)
+    template = environment.get_template(template_file_diamond)
+    content = template.render(
+        potential=potential, ainit=ainit, active_id=active_member_id
     )
 
     # Run lammps script
