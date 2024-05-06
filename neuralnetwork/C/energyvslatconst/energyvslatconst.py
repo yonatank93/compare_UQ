@@ -50,12 +50,7 @@ def energyvslatconst(
         Standard deviations of the energy, calculated using dropout ensemble.
     """
     # Get the correct lammps template
-    if structure == "graphene":
-        template_file = "energy_latconst.tpl"
-    elif structure == "diamond":
-        template_file = "energy_latconst_diamond.tpl"
-    else:
-        raise ValueError(f"Unknown structure, available structure: {avail_struct}")
+    template_file = f"energy_latconst_{structure}.tpl"
 
     # Vary lattice constants
     predictions = np.empty((0, 3))

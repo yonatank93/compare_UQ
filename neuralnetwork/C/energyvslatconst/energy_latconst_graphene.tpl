@@ -31,5 +31,5 @@ kim interactions C
 kim param	set active_member_id 1 {{ set_id }}
 # compute energy
 run		0
-variable	natoms equal 2
+variable 	natoms equal "count(all)" 
 variable	E_mean equal pe/${natoms}
