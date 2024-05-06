@@ -8,7 +8,7 @@ atom_style	atomic
 kim init	{{ potential }} metal
 # boundary conditions
 boundary	p p p
-# create a honeycomb lattice
+# create a diamond lattice
 lattice		diamond {{ a }}
 # create simulation box and atoms
 region		reg block 0 1 0 1 0 1 units lattice
@@ -20,5 +20,5 @@ kim interactions C
 kim param	set active_member_id 1 {{ set_id }}
 # compute energy
 run		0
-variable	natoms equal 2
+variable 	natoms equal "count(all)" 
 variable	E_mean equal pe/${natoms}
