@@ -11,6 +11,7 @@ ROOT_DIR = WORK_DIR.parent
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
+Nnodes = settings["Nnodes"]
 
 
 slurm_commands = """#!/bin/bash
@@ -24,7 +25,7 @@ slurm_commands = """#!/bin/bash
 #SBATCH --job-name=DUNN_train   # job name
 #SBATCH --mail-user=kurniawanyo@outlook.com   # email address
 #SBATCH --mail-type=FAIL
-#SBATCH -o ./results/training/%s_partition/train_loss.out # STDOUT
+#SBATCH -o ./results/training/%s_partition_%s/train_loss.out # STDOUT
 
 
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
@@ -45,7 +46,8 @@ python training.py
 
 echo "All Done!"
 """ % (
-    partition
+    partition,
+    "_".join([str(n) for n in Nnodes]),
 )
 
 # Write
