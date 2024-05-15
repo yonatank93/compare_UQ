@@ -9,13 +9,6 @@ import os
 import numpy as np
 import lammps
 
-try:
-    from .generate_graphene import generate_unit_cell
-    from .relaxation_latconst import equilibrate_graphene
-except ImportError:
-    from generate_graphene import generate_unit_cell
-    from relaxation_latconst import equilibrate_graphene
-
 
 WORK_DIR = Path(__file__).absolute().parent
 # template_file = "energy_latconst.tpl"
@@ -84,43 +77,3 @@ def energy_given_latconst(potential, a, active_member_id, template_file, lmpfile
     eng_error = lmp.extract_variable("E_stdev")
     lmp.close()
     return a, eng_mean, eng_error
-
-
-if __name__ == "__main__":
-    from datetime import datetime
-    import matplotlib.pyplot as plt
-
-    # Equilibration
-    # potential = "DUNN_WenTadmor_2019v1_C__MO_584345505904_000"
-    potential = "DUNN_best_train"
-    ainit = 2.466  # From materials project for graphite-like structure
-    a0, e0 = equilibrate_graphene(potential, ainit)
-    alist = np.linspace(0.93, 1.07, 16) * a0
-
-    start = datetime.now()
-    alist, elist, errlist = energyvslatconst(potential, alist)
-    end = datetime.now()
-    print("Evaluation time:", end - start)
-
-    # Load DFT data
-    dft_data = np.loadtxt("dft_data.txt", delimiter=",")
-
-    # Plot the result curves
-    # Energy vs lattice constant
-    plt.figure()
-    plt.plot(*(dft_data.T), "r.", zorder=10, label="DFT")
-    plt.plot(alist, elist, "-", label="DUNN mean")
-    plt.fill_between(
-        alist,
-        elist - errlist,
-        elist + errlist,
-        alpha=0.5,
-        zorder=-1,
-        label="DUNN uncertainty",
-    )
-    plt.ylim(-8.1, -7.5)
-    plt.xlabel(r"Lattice constant $a$ $(\AA)$")
-    plt.ylabel("Energy (eV/atom)")
-    plt.legend()
-
-    plt.show()
