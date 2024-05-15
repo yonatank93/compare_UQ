@@ -54,7 +54,7 @@ MODEL_DIR = RES_DIR / "models"
 
 # Architecture
 Nlayers = 4  # Number of layers, excluding input layer, including outpt layer
-Nnodes = 128  # Number of nodes per hidden layer
+Nnodes = [128, 128, 128]  # Number of nodes for each hidden layer
 dropout_ratio = 0.1
 
 # Optimizer settings
@@ -78,20 +78,20 @@ model = NeuralNetwork(descriptor)
 
 # Layers
 hidden_layer_mappings = []
-for _ in range(Nlayers - 2):
+for ii in range(Nlayers - 2):
     hidden_layer_mappings.append(nn.Dropout(dropout_ratio))
-    hidden_layer_mappings.append(nn.Linear(Nnodes, Nnodes))
+    hidden_layer_mappings.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings.append(nn.Tanh())
 
 model.add_layers(
     # input layer
-    nn.Linear(descriptor.get_size(), Nnodes),  # Mapping from input layer to the first
+    nn.Linear(descriptor.get_size(), Nnodes[0]),  # Mapping from input layer to the first
     nn.Tanh(),  # hidden layer
     # hidden layer(s)
     *hidden_layer_mappings,  # Mappings between hidden layers in the middle
     # hidden layer(s)
     nn.Dropout(dropout_ratio),  # Mapping from the last hidden layer to the output layer
-    nn.Linear(Nnodes, 1),
+    nn.Linear(Nnodes[-1], 1),
     # output layer
 )
 model.set_save_metadata(
@@ -153,42 +153,42 @@ minimize_setting = dict(
 suffix = f"epochs{nepochs_initial}"
 trained_model_file = MODEL_DIR / f"final_model_dropout_{suffix}.pkl"
 
-if trained_model_file.exists():
-    model.load(trained_model_file)
-else:
-    print(f"Run initial training for {nepochs_initial} epochs")
-    start_time = datetime.now()
-    result = loss.minimize(method="Adam", **minimize_setting)
-    end_time = datetime.now()
-    model.save(trained_model_file)
-    print("Initial training time:", end_time - start_time)
+# if trained_model_file.exists():
+#     model.load(trained_model_file)
+# else:
+#     print(f"Run initial training for {nepochs_initial} epochs")
+#     start_time = datetime.now()
+#     result = loss.minimize(method="Adam", **minimize_setting)
+#     end_time = datetime.now()
+#     model.save(trained_model_file)
+#     print("Initial training time:", end_time - start_time)
 
-# After that, we continue training for the specified total number of epochs, but we also
-# export the model every 10 epochs.
-ii = 0
-nepochs_done = nepochs_initial
-while nepochs_done < nepochs_total:
-    start_epoch = nepochs_initial + ii * nepochs_save_period + 1
-    num_epochs = nepochs_save_period - 1
-    nepochs_done = start_epoch + num_epochs
-    minimize_setting.update({"start_epoch": start_epoch, "num_epochs": num_epochs})
+# # After that, we continue training for the specified total number of epochs, but we also
+# # export the model every 10 epochs.
+# ii = 0
+# nepochs_done = nepochs_initial
+# while nepochs_done < nepochs_total:
+#     start_epoch = nepochs_initial + ii * nepochs_save_period + 1
+#     num_epochs = nepochs_save_period - 1
+#     nepochs_done = start_epoch + num_epochs
+#     minimize_setting.update({"start_epoch": start_epoch, "num_epochs": num_epochs})
 
-    if start_epoch > epoch_change_lr:
-        minimize_setting.update({"lr": 1e-4})
-    else:
-        minimize_setting.update({"lr": learning_rate})
+#     if start_epoch > epoch_change_lr:
+#         minimize_setting.update({"lr": 1e-4})
+#     else:
+#         minimize_setting.update({"lr": learning_rate})
 
-    suffix = f"epochs{nepochs_done}"
-    trained_model_file = MODEL_DIR / f"final_model_dropout_{suffix}.pkl"
+#     suffix = f"epochs{nepochs_done}"
+#     trained_model_file = MODEL_DIR / f"final_model_dropout_{suffix}.pkl"
 
-    if trained_model_file.exists():
-        model.load(trained_model_file)
-    else:
-        start_time = datetime.now()
-        result = loss.minimize(method="Adam", **minimize_setting)
-        end_time = datetime.now()
-        model.save(trained_model_file)
-        print(f"Training time up to epochs {nepochs_done}: {end_time - start_time}")
+#     if trained_model_file.exists():
+#         model.load(trained_model_file)
+#     else:
+#         start_time = datetime.now()
+#         result = loss.minimize(method="Adam", **minimize_setting)
+#         end_time = datetime.now()
+#         model.save(trained_model_file)
+#         print(f"Training time up to epochs {nepochs_done}: {end_time - start_time}")
 
-    ii += 1
-    print(start_epoch, nepochs_done)
+#     ii += 1
+#     print(start_epoch, nepochs_done)
