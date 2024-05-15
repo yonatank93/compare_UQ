@@ -23,8 +23,10 @@ DATA_DIR = ROOT_DIR / "data"
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
+suffix = "_".join([str(n) for n in settings["Nnodes"]])
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
-RES_DIR = WORK_DIR / "results" / "dropout" / f"{partition}_partition"
+RES_DIR = WORK_DIR / "results" / "dropout" / f"{partition}_partition_{suffix}"
+
 
 u = create_units("2018")
 

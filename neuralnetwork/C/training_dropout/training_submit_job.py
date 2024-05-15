@@ -12,6 +12,7 @@ with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
 Nnodes = settings["Nnodes"]
+suffix = "_".join([str(n) for n in Nnodes])
 
 
 slurm_commands = """#!/bin/bash
@@ -47,7 +48,7 @@ python training.py
 echo "All Done!"
 """ % (
     partition,
-    "_".join([str(n) for n in Nnodes]),
+    suffix,
 )
 
 # Write

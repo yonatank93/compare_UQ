@@ -57,14 +57,10 @@ nepochs_save_period = 10  # Then run and save every this many epochs
 epoch_change_lr = 5000
 
 # Directories
+suffix = "_".join([str(n) for n in Nnodes])
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
 FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = (
-    WORK_DIR
-    / "results"
-    / "training"
-    / f"{partition}_partition_{'_'.join([str(n) for n in Nnodes])}"
-)
+RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition_{suffix}"
 if not RES_DIR.exists():
     print("Creating", RES_DIR)
     RES_DIR.mkdir()

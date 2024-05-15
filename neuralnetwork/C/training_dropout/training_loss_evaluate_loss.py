@@ -42,19 +42,10 @@ DATA_DIR = ROOT_DIR / "data"
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
-# Directories
-PART_DIR = DATA_DIR / f"{partition}_partition_data"
-FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition"
-if not RES_DIR.exists():
-    RES_DIR.mkdir()
-META_DIR = RES_DIR / "metadata"
-MODEL_DIR = RES_DIR / "models"
-
 
 # Architecture
-Nlayers = 4  # Number of layers, excluding input layer, including outpt layer
-Nnodes = 128  # Number of nodes per hidden layer
+Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
+Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
 dropout_ratio = 0.1
 
 # Optimizer settings
@@ -63,6 +54,16 @@ batch_size = 100
 nepochs_total = 50_000  # How many epochs to run in total
 nepochs_burnin = 2000  # Run this many epochs first
 nepochs_save_period = 10  # Then run and save every this many epochs
+
+# Directories
+suffix = "_".join([str(n) for n in Nnodes])
+PART_DIR = DATA_DIR / f"{partition}_partition_data"
+FP_DIR = PART_DIR / "fingerprints"
+RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition_{suffix}"
+if not RES_DIR.exists():
+    RES_DIR.mkdir()
+META_DIR = RES_DIR / "metadata"
+MODEL_DIR = RES_DIR / "models"
 
 
 ##########################################################################################
