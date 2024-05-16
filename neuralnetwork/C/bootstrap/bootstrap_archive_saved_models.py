@@ -17,7 +17,8 @@ ROOT_DIR = WORK_DIR.parent
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+suffix = "_".join([str(n) for n in settings["Nnodes"]])
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
 
 for ii in range(100):
     if Path(RES_DIR / f"{ii:03d}" / "last_params.npy").exists():
@@ -38,5 +39,5 @@ for ii in range(100):
         os.system("rm *.pkl")
         os.system("ls")
         os.chdir(WORK_DIR)
-    # else:
-    #     print(ii)
+    else:
+        print(f"Ensemble member index {ii} doesn't exists")

@@ -9,7 +9,8 @@ ROOT_DIR = WORK_DIR.parent
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+suffix = "_".join([str(n) for n in settings["Nnodes"]])
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
 
 
 slurm_tpl = """#!/bin/bash
@@ -49,17 +50,17 @@ echo "All Done!"
 
 env = jinja2.Environment()
 template = env.from_string(slurm_tpl)
-fname = RES_DIR / "submit_job_bootstrap.sh"
 
 nsamples = 100
 for ii in range(nsamples):
     # Make directoryto store the result for sample ii
     SAMPLE_DIR = RES_DIR / f"{ii:03d}"
+    fname = SAMPLE_DIR / "submit_job_randinit.sh"
     if not SAMPLE_DIR.exists():
         SAMPLE_DIR.mkdir(parents=True)
     # Render
     content = template.render(
-        set_idx=ii, idx_str=SAMPLE_DIR.name, partition_dir=f"{partition}_partition"
+        set_idx=ii, idx_str=SAMPLE_DIR.name, partition_dir=RES_DIR.name
     )
     # Write sbatch file
     with open(fname, "w") as f:

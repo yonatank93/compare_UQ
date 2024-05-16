@@ -32,15 +32,15 @@ with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
 
+# Architecture
+Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
+Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
+dropout_ratio = 0.1
+
 # Directories
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
 FP_DIR = PART_DIR / "fingerprints"
 
-
-# Architecture
-Nlayers = 4  # Number of layers, excluding input layer, including outpt layer
-Nnodes = 128  # Number of nodes per hidden layer
-dropout_ratio = 0.1
 
 # Optimizer settings
 learning_rate = 0.001
@@ -60,18 +60,18 @@ model = NeuralNetwork(descriptor)
 hidden_layer_mappings = []
 for _ in range(Nlayers - 2):
     hidden_layer_mappings.append(nn.Dropout(dropout_ratio))
-    hidden_layer_mappings.append(nn.Linear(Nnodes, Nnodes))
+    hidden_layer_mappings.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings.append(nn.Tanh())
 
 model.add_layers(
     # input layer
-    nn.Linear(descriptor.get_size(), Nnodes),  # Mapping from input layer to the first
+    nn.Linear(descriptor.get_size(), Nnodes[0]),  # Mapping from input layer to the first
     nn.Tanh(),  # hidden layer
     # hidden layer(s)
     *hidden_layer_mappings,  # Mappings between hidden layers in the middle
     # hidden layer(s)
     nn.Dropout(dropout_ratio),  # Mapping from the last hidden layer to the output layer
-    nn.Linear(Nnodes, 1),
+    nn.Linear(Nnodes[-1], 1),
     # output layer
 )
 
