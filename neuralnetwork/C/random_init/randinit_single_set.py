@@ -83,7 +83,7 @@ model = NeuralNetwork(descriptor)
 
 # Layers
 hidden_layer_mappings = []
-for _ in range(Nlayers - 2):
+for ii in range(Nlayers - 2):
     hidden_layer_mappings.append(nn.Dropout(dropout_ratio))
     hidden_layer_mappings.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings.append(nn.Tanh())
