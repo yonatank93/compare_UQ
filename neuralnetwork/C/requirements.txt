@@ -4,3 +4,4 @@ kliff==0.4.1
 scikit-learn
 torch
 ase==3.23.0b1
+emcee
