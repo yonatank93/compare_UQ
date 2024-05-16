@@ -12,6 +12,7 @@ import subprocess
 
 import numpy as np
 import torch
+from emcee.autocorr import integrated_time
 
 from kliff import nn
 from kliff.calculators import CalculatorTorch
@@ -46,25 +47,26 @@ with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
 
+# Architecture
+Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
+Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
+dropout_ratio = 0.1
+
 # Directories
+suffix = "_".join([str(n) for n in Nnodes])
 TRAIN_MODEL_DIR = (
     ROOT_DIR
     / "training_dropout"
     / "results"
     / "training"
-    / f"{partition}_partition"
+    / f"{partition}_partition_{suffix}"
     / "models"
 )
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
 FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
 if not RES_DIR.exists():
     RES_DIR.mkdir(parents=True)
-
-# Architecture
-Nlayers = 4  # Number of layers, excluding input layer, including outpt layer
-Nnodes = 128  # Number of nodes per hidden layer
-dropout_ratio = 0.1
 
 
 ##########################################################################################
@@ -85,32 +87,32 @@ model2 = NeuralNetwork(descriptor)
 # Layers
 hidden_layer_mappings1 = []
 hidden_layer_mappings2 = []
-for _ in range(Nlayers - 2):
+for ii in range(Nlayers - 2):
     hidden_layer_mappings1.append(nn.Dropout(dropout_ratio))
-    hidden_layer_mappings1.append(nn.Linear(Nnodes, Nnodes))
-    hidden_layer_mappings2.append(nn.Linear(Nnodes, Nnodes))
+    hidden_layer_mappings1.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
+    hidden_layer_mappings2.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings1.append(nn.Tanh())
     hidden_layer_mappings2.append(nn.Tanh())
 
 model1.add_layers(
     # input layer
-    nn.Linear(descriptor.get_size(), Nnodes),  # Mapping from input layer to the first
+    nn.Linear(descriptor.get_size(), Nnodes[0]),  # Mapping from input layer to the first
     nn.Tanh(),  # hidden layer
     # hidden layer(s)
     *hidden_layer_mappings1,  # Mappings between hidden layers in the middle
     # hidden layer(s)
     nn.Dropout(dropout_ratio),  # Mapping from the last hidden layer to the output layer
-    nn.Linear(Nnodes, 1),
+    nn.Linear(Nnodes[-1], 1),
     # output layer
 )
 model2.add_layers(
     # input layer
-    nn.Linear(descriptor.get_size(), Nnodes),  # Mapping from input layer to the first
+    nn.Linear(descriptor.get_size(), Nnodes[0]),  # Mapping from input layer to the first
     nn.Tanh(),  # hidden layer
     # hidden layer(s)
     *hidden_layer_mappings2,  # Mappings between hidden layers in the middle
     # hidden layer(s)
-    nn.Linear(Nnodes, 1),
+    nn.Linear(Nnodes[-1], 1),
     # output layer
 )
 
@@ -145,9 +147,29 @@ _ = calc2.create(
 
 
 ##########################################################################################
+# Analyze autocorrelation
+# -----------------------
+# I think it is save to set the burn-in to be 30_000 epochs. If we look at the training
+# cost, the cost has already plateaued after epoch 30_000.
+burnin = 30_000
+
+# Load the training loss data
+loss_train = np.loadtxt(TRAIN_MODEL_DIR.parent / "loss_values_train.txt")
+idx_samples = np.where(loss_train[:, 0] >= burnin)[0]
+loss_samples = loss_train[idx_samples, 1]
+
+# Estimate the autocorrelation length
+acorr_est = integrated_time(loss_samples.reshape((-1, 1)))
+print("Estimated autocorrelation length:", acorr_est)
+# The estimated autocorrelation length is pretty low; it is less than 1.0. So, it is save
+# to sample every 100 epochs.
+sample_freq = 100
+
+
+##########################################################################################
 # Write KIM model
 # ---------------
-for set_idx, epoch in enumerate(np.arange(30000, 40000, 100)):
+for set_idx, epoch in enumerate(np.arange(burnin, 40000, sample_freq)):
     SAMPLE_DIR = RES_DIR / f"{set_idx:03d}"
 
     # Load last parameters

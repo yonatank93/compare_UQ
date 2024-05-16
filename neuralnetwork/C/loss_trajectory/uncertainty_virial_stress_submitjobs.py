@@ -15,7 +15,8 @@ ROOT_DIR = WORK_DIR.parent
 with open(ROOT_DIR / "settings.json", "r") as f:
     settings = json.load(f)
 partition = settings["partition"]
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+suffix = "_".join([str(n) for n in settings["Nnodes"]])
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
 
 
 sbatch_template = """#!/bin/bash
