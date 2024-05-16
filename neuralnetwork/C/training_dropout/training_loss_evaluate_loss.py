@@ -183,10 +183,10 @@ best_epoch = int(loss_values[idx, 0])
 best_model_file = MODEL_DIR / f"final_model_dropout_epochs{best_epoch}.pkl"
 model.load(best_model_file)
 # Move the best model pickle file
-shutil.copy(best_model_file, PART_DIR / f"model_best_{config_id}.pkl")
+shutil.copy(best_model_file, RES_DIR / f"model_best_{config_id}.pkl")
 
 # Write KIM model
-kim_model_file = PART_DIR / f"DUNN_best_{config_id}"
+kim_model_file = RES_DIR / f"DUNN_best_{config_id}"
 model.write_kim_model(kim_model_file)
 # (Re)Install best model
 subprocess.run(
