@@ -31,8 +31,9 @@ with open(ROOT_DIR / "settings.json", "r") as f:
 partition = settings["partition"]
 
 # Directories
+suffix = "_".join([str(n) for n in settings["Nnodes"]])
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition"
+RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
 if not RES_DIR.exists():
     RES_DIR.mkdir()
 
