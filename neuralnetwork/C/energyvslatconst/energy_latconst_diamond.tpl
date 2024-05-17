@@ -21,4 +21,4 @@ kim param	set active_member_id 1 {{ set_id }}
 # compute energy
 run		0
 variable 	natoms equal "count(all)" 
-variable	E_mean equal pe/${natoms}
+variable	Eng equal pe/${natoms}

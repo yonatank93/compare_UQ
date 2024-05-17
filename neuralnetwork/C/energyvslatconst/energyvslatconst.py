@@ -12,7 +12,12 @@ import lammps
 
 WORK_DIR = Path(__file__).absolute().parent
 # template_file = "energy_latconst.tpl"
-avail_struct = ["graphene", "diamond"]
+avail_struct = ["graphene", "diamond", "graphite"]
+struct_preds_keys = {
+    "graphene": ["Eng"],
+    "diamond": ["Eng"],
+    "graphite": ["Eng", "c"],
+}
 
 
 def energyvslatconst(
@@ -42,23 +47,22 @@ def energyvslatconst(
     eng_error: np.ndarray
         Standard deviations of the energy, calculated using dropout ensemble.
     """
-    # Get the correct lammps template
-    template_file = f"energy_latconst_{structure}.tpl"
-
     # Vary lattice constants
-    predictions = np.empty((0, 3))
-
-    for a in alist:
-        preds_a = energy_given_latconst(
-            potential, a, active_member_id, template_file, lmpfile
-        )
+    for ii, a in enumerate(alist):
+        preds = energy_given_latconst(potential, a, structure, active_member_id, lmpfile)
         # Append the result
-        predictions = np.row_stack((predictions, preds_a))
+        if ii == 0:
+            predictions = preds
+        else:
+            predictions = np.row_stack((predictions, preds))
 
     return predictions.T
 
 
-def energy_given_latconst(potential, a, active_member_id, template_file, lmpfile=None):
+def energy_given_latconst(potential, a, structure, active_member_id, lmpfile=None):
+    # Get lammps template
+    template_file = f"energy_latconst_{structure}.tpl"
+    # Write lammps input file from template
     loader = jinja2.FileSystemLoader(WORK_DIR)
     environment = jinja2.Environment(loader=loader)
     tempfile = template_file
@@ -73,7 +77,6 @@ def energy_given_latconst(potential, a, active_member_id, template_file, lmpfile
         with open(lmpfile, "w") as f:
             f.write(content)
         lmp.file(lmpfile)
-    eng_mean = lmp.extract_variable("E_mean")
-    eng_error = lmp.extract_variable("E_stdev")
+    preds = [lmp.extract_variable(key) for key in struct_preds_keys[structure]]
     lmp.close()
-    return a, eng_mean, eng_error
+    return np.append(a, preds)

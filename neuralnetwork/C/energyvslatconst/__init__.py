@@ -4,4 +4,4 @@ from .relaxation_latconst import (
     equilibrate_graphite,
     equilibrate_diamond,
 )
-from .energyvslatconst import energyvslatconst
+from .energyvslatconst import energyvslatconst, energy_given_latconst
