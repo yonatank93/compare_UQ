@@ -78,20 +78,20 @@ model = NeuralNetwork(descriptor)
 
 # Layers
 hidden_layer_mappings = []
-for _ in range(Nlayers - 2):
+for ii in range(Nlayers - 2):
     hidden_layer_mappings.append(nn.Dropout(dropout_ratio))
-    hidden_layer_mappings.append(nn.Linear(Nnodes, Nnodes))
+    hidden_layer_mappings.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings.append(nn.Tanh())
 
 model.add_layers(
     # input layer
-    nn.Linear(descriptor.get_size(), Nnodes),  # Mapping from input layer to the first
+    nn.Linear(descriptor.get_size(), Nnodes[0]),  # Mapping from input layer to the first
     nn.Tanh(),  # hidden layer
     # hidden layer(s)
     *hidden_layer_mappings,  # Mappings between hidden layers in the middle
     # hidden layer(s)
     nn.Dropout(dropout_ratio),  # Mapping from the last hidden layer to the output layer
-    nn.Linear(Nnodes, 1),
+    nn.Linear(Nnodes[-1], 1),
     # output layer
 )
 
