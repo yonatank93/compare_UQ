@@ -9,6 +9,7 @@ import sys
 
 import numpy as np
 import scipy
+from scipy.optimize import least_squares
 from sklearn.model_selection import train_test_split
 import torch
 
@@ -131,7 +132,7 @@ loader_list = list(loader)  # Convert to list to make it easier to index
 # We split the test set into test and validation sets
 indices = np.arange(nconfigs)
 valset_ratio = float(argv[1])  # Percentage of validation set compared to the entire data
-idx_test, idx_val = train_test_split(indices, test_size=valset_ratio)
+idx_test, idx_val = train_test_split(indices, test_size=valset_ratio, random_state=seed)
 # Update JAC_DIR
 JAC_DIR = JAC_DIR / f"test_validation_{int(valset_ratio*100)}%_seed{seed}"
 if not JAC_DIR.exists():
@@ -312,29 +313,25 @@ if jac_for_test_file.exists() and jac_for_val_file.exists():
 else:
     # Compute Jacobian for energy predictions
     print("Compute forces jacobian...")
-    jac_for_test_ragged = np.array(
-        list(
-            tqdm(
-                map(compute_jacobian_forces_one_config, idx_test),
-                total=len(idx_test),
-            )
+    jac_for_test_ragged = list(
+        tqdm(
+            map(compute_jacobian_forces_one_config, idx_test),
+            total=len(idx_test),
         )
     )
     # Stack the Jacobian
-    jac_for_test_ = np.empty((0, nparams))
+    jac_for_test = np.empty((0, nparams))
     for jac in tqdm(jac_for_test_ragged):
         jac_for_test = np.row_stack((jac_for_test, jac))
 
-    jac_for_val_ragged = np.array(
-        list(
-            tqdm(
-                map(compute_jacobian_forces_one_config, idx_val),
-                total=len(idx_val),
-            )
+    jac_for_val_ragged = list(
+        tqdm(
+            map(compute_jacobian_forces_one_config, idx_val),
+            total=len(idx_val),
         )
     )
     # Stack the Jacobian
-    jac_for_val_ = np.empty((0, nparams))
+    jac_for_val = np.empty((0, nparams))
     for jac in tqdm(jac_for_val_ragged):
         jac_for_val = np.row_stack((jac_for_val, jac))
     # Export this Jacobian
@@ -398,5 +395,46 @@ else:
     # This calculation might take around 3 hours
     print("Compute eigenvalues and eigenvectors...")
     eighvals_val, eighvecs_val = scipy.linalg.eigh(fim_val)
-    np.save(eighvals_val_file, eighvals_val)s
+    np.save(eighvals_val_file, eighvals_val)
     np.save(eighvecs_val_file, eighvecs_val)
+
+
+# Estimate the effective number of parameters
+# Test set
+print("Estimate the number of effective parameters from the test set...")
+loader_list_test = [loader_list[ii] for ii in idx_test]
+C0_times_2_test = loss._get_loss_epoch(loader_list_test)
+
+
+def find_optimal_N_objective(N):
+    T = C0_times_2_test / N
+    n = sum(eighvals_test > T)
+    return N - n
+
+
+opt_test = least_squares(find_optimal_N_objective, nparams / 2)
+opt_N_test = int(np.ceil(opt_test.x))
+
+# Validation set
+print("Estimate the number of effective parameters from the validation set...")
+loader_list_val = [loader_list[ii] for ii in idx_val]
+C0_times_2_val = loss._get_loss_epoch(loader_list_val)
+
+
+def find_optimal_N_objective(N):
+    T = C0_times_2_val / N
+    n = sum(eighvals_val > T)
+    return N - n
+
+
+opt_val = least_squares(find_optimal_N_objective, nparams / 2)
+opt_N_val = int(np.ceil(opt_val.x))
+
+# Export
+print("Exporting...")
+opt_N_dict = {
+    "test": {"min_cost": C0_times_2_test, "ndata": len(jac_test), "N": opt_N_test},
+    "validation": {"min_cost": C0_times_2_val, "ndata": len(jac_val), "N": opt_N_val},
+}
+with open(JAC_DIR / "number_effective_params.json", "w") as f:
+    json.dump(opt_N_dict, f, indent=4)
