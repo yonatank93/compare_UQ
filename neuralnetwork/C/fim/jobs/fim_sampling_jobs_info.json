@@ -1,0 +1,326 @@
+{
+    "66391268": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 64"
+    },
+    "66391269": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 128"
+    },
+    "66391270": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 196"
+    },
+    "66391271": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 64"
+    },
+    "66391272": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 128"
+    },
+    "66391273": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 196"
+    },
+    "66391274": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 64"
+    },
+    "66391275": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 128"
+    },
+    "66391276": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 196"
+    },
+    "66391277": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 64"
+    },
+    "66391278": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 128"
+    },
+    "66391279": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 196"
+    },
+    "66391280": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 64"
+    },
+    "66391281": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 128"
+    },
+    "66391282": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 196"
+    },
+    "66391283": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 64"
+    },
+    "66391284": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 128"
+    },
+    "66391285": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 196"
+    },
+    "66391286": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 64"
+    },
+    "66391287": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 128"
+    },
+    "66391288": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 196"
+    },
+    "66391289": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 64"
+    },
+    "66391290": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 128"
+    },
+    "66391291": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 196"
+    },
+    "66391292": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 64"
+    },
+    "66391293": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 128"
+    },
+    "66391294": {
+        "script": "fim_effective_parameters_no_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 196"
+    },
+    "66391295": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 64"
+    },
+    "66391296": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 128"
+    },
+    "66391297": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 196"
+    },
+    "66391298": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 64"
+    },
+    "66391299": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 128"
+    },
+    "66391300": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 196"
+    },
+    "66391301": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 64"
+    },
+    "66391302": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 128"
+    },
+    "66391303": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 196"
+    },
+    "66391304": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 64"
+    },
+    "66391305": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 128"
+    },
+    "66391306": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 196"
+    },
+    "66391307": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 64"
+    },
+    "66391308": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 128"
+    },
+    "66391309": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 196"
+    },
+    "66391310": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 64"
+    },
+    "66391311": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 128"
+    },
+    "66391312": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 196"
+    },
+    "66391313": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 64"
+    },
+    "66391314": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 128"
+    },
+    "66391315": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 196"
+    },
+    "66391316": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 64"
+    },
+    "66391317": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 128"
+    },
+    "66391318": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 196"
+    },
+    "66391319": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 64"
+    },
+    "66391320": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 128"
+    },
+    "66391321": {
+        "script": "fim_effective_parameters_weak_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 196"
+    },
+    "66391322": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 64"
+    },
+    "66391323": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 128"
+    },
+    "66391324": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 64 196"
+    },
+    "66391325": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 64"
+    },
+    "66391326": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 128"
+    },
+    "66391327": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 128 196"
+    },
+    "66391328": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 64"
+    },
+    "66391329": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 128"
+    },
+    "66391330": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 64 196 196"
+    },
+    "66391331": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 64"
+    },
+    "66391332": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 128"
+    },
+    "66391333": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 64 196"
+    },
+    "66391334": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 64"
+    },
+    "66391335": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 128"
+    },
+    "66391336": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 128 196"
+    },
+    "66391337": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 64"
+    },
+    "66391338": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 128"
+    },
+    "66391339": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 128 196 196"
+    },
+    "66391340": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 64"
+    },
+    "66391341": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 128"
+    },
+    "66391342": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 64 196"
+    },
+    "66391343": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 64"
+    },
+    "66391344": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 128"
+    },
+    "66391345": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 128 196"
+    },
+    "66391346": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 64"
+    },
+    "66391347": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 128"
+    },
+    "66391348": {
+        "script": "fim_effective_parameters_strong_prior.py",
+        "arguments": "--partition mingjian --nlayers 4 --nnodes 196 196 196"
+    }
+}
