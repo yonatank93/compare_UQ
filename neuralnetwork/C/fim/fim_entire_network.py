@@ -4,7 +4,9 @@ from pathlib import Path
 import json
 import pickle
 from tqdm import tqdm
-import sys
+
+# import sys
+import argparse
 
 
 import numpy as np
@@ -21,23 +23,36 @@ from kliff.descriptors import SymmetryFunction
 from kliff.loss import Loss
 from kliff.models import NeuralNetwork
 
-# CL arguments
-argv = sys.argv
-
 # Random seed
-seed = int(argv[2])
+seed = 1
 np.random.seed(seed)
 torch.manual_seed(seed)
 
 
-# # Setup
-# ## Variables
-# Read setting file
-WORK_DIR = Path().absolute()
+# CL arguments
+WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
 DATA_DIR = ROOT_DIR / "data"
-with open(ROOT_DIR / "settings.json", "r") as f:
-    settings = json.load(f)
+# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument("-p", "--partition", dest="partition")
+arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
+arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+args = arg_parser.parse_args()
+if len(sys.argv) > 1:
+    # Command line arguments present
+    settings = {
+        "partition": args.partition,
+        "Nlayers": args.nlayers,
+        "Nnodes": args.nnodes,
+    }
+else:
+    # No command line arguments, read setting file
+    with open(ROOT_DIR / "settings.json", "r") as f:
+        settings = json.load(f)
+
+# # Setup
+# ## Variables
 partition = settings["partition"]
 suffix = "_".join([str(n) for n in settings["Nnodes"]])
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
@@ -131,7 +146,7 @@ loader_list = list(loader)  # Convert to list to make it easier to index
 
 # We split the test set into test and validation sets
 indices = np.arange(nconfigs)
-valset_ratio = float(argv[1])  # Percentage of validation set compared to the entire data
+valset_ratio = 0.1  # Percentage of validation set compared to the entire data
 idx_test, idx_val = train_test_split(indices, test_size=valset_ratio, random_state=seed)
 # Update JAC_DIR
 JAC_DIR = JAC_DIR / f"test_validation_{int(valset_ratio*100)}%_seed{seed}"
@@ -198,37 +213,37 @@ def compute_jacobian_energy_one_config(ii):
     return jac_eng_config
 
 
-jac_eng_test_file = JAC_DIR / "jacobian_entire_network_energy_test.npy"
-jac_eng_val_file = JAC_DIR / "jacobian_entire_network_energy_validation.npy"
-if jac_eng_test_file.exists() and jac_eng_val_file.exists():
-    print("Loading energy jacobian...")
-    jac_eng_test = np.load(jac_eng_test_file)
-    jac_eng_val = np.load(jac_eng_val_file)
-else:
-    # Compute Jacobian for energy predictions
-    print("Compute energy jacobian...")
-    jac_eng_test = np.array(
-        list(
-            tqdm(
-                map(compute_jacobian_energy_one_config, idx_test),
-                total=len(idx_test),
-            )
-        )
-    )
-    jac_eng_val = np.array(
-        list(
-            tqdm(
-                map(compute_jacobian_energy_one_config, idx_val),
-                total=len(idx_val),
-            )
-        )
-    )
-    # Export this Jacobian
-    np.save(jac_eng_test_file, jac_eng_test)
-    np.save(jac_eng_val_file, jac_eng_val)
+# jac_eng_test_file = JAC_DIR / "jacobian_entire_network_energy_test.npy"
+# jac_eng_val_file = JAC_DIR / "jacobian_entire_network_energy_validation.npy"
+# if jac_eng_test_file.exists() and jac_eng_val_file.exists():
+#     print("Loading energy jacobian...")
+#     jac_eng_test = np.load(jac_eng_test_file)
+#     jac_eng_val = np.load(jac_eng_val_file)
+# else:
+#     # Compute Jacobian for energy predictions
+#     print("Compute energy jacobian...")
+#     jac_eng_test = np.array(
+#         list(
+#             tqdm(
+#                 map(compute_jacobian_energy_one_config, idx_test),
+#                 total=len(idx_test),
+#             )
+#         )
+#     )
+#     jac_eng_val = np.array(
+#         list(
+#             tqdm(
+#                 map(compute_jacobian_energy_one_config, idx_val),
+#                 total=len(idx_val),
+#             )
+#         )
+#     )
+#     # Export this Jacobian
+#     np.save(jac_eng_test_file, jac_eng_test)
+#     np.save(jac_eng_val_file, jac_eng_val)
 
 
-# ## Compute the derivative of forces
+## Compute the derivative of forces
 
 
 def get_tensor_info(tensor):
@@ -304,39 +319,39 @@ def compute_jacobian_forces_one_config(ii):
     return grad_config
 
 
-jac_for_test_file = JAC_DIR / "jacobian_entire_network_forces_test.npy"
-jac_for_val_file = JAC_DIR / "jacobian_entire_network_forces_validation.npy"
-if jac_for_test_file.exists() and jac_for_val_file.exists():
-    print("Loading forces jacobian...")
-    jac_for_test = np.load(jac_for_test_file)
-    jac_for_val = np.load(jac_for_val_file)
-else:
-    # Compute Jacobian for energy predictions
-    print("Compute forces jacobian...")
-    jac_for_test_ragged = list(
-        tqdm(
-            map(compute_jacobian_forces_one_config, idx_test),
-            total=len(idx_test),
-        )
-    )
-    # Stack the Jacobian
-    jac_for_test = np.empty((0, nparams))
-    for jac in tqdm(jac_for_test_ragged):
-        jac_for_test = np.row_stack((jac_for_test, jac))
+# jac_for_test_file = JAC_DIR / "jacobian_entire_network_forces_test.npy"
+# jac_for_val_file = JAC_DIR / "jacobian_entire_network_forces_validation.npy"
+# if jac_for_test_file.exists() and jac_for_val_file.exists():
+#     print("Loading forces jacobian...")
+#     jac_for_test = np.load(jac_for_test_file)
+#     jac_for_val = np.load(jac_for_val_file)
+# else:
+#     # Compute Jacobian for energy predictions
+#     print("Compute forces jacobian...")
+#     jac_for_test_ragged = list(
+#         tqdm(
+#             map(compute_jacobian_forces_one_config, idx_test),
+#             total=len(idx_test),
+#         )
+#     )
+#     # Stack the Jacobian
+#     jac_for_test = np.empty((0, nparams))
+#     for jac in tqdm(jac_for_test_ragged):
+#         jac_for_test = np.row_stack((jac_for_test, jac))
 
-    jac_for_val_ragged = list(
-        tqdm(
-            map(compute_jacobian_forces_one_config, idx_val),
-            total=len(idx_val),
-        )
-    )
-    # Stack the Jacobian
-    jac_for_val = np.empty((0, nparams))
-    for jac in tqdm(jac_for_val_ragged):
-        jac_for_val = np.row_stack((jac_for_val, jac))
-    # Export this Jacobian
-    np.save(jac_for_test_file, jac_for_test)
-    np.save(jac_for_val_file, jac_for_val)
+#     jac_for_val_ragged = list(
+#         tqdm(
+#             map(compute_jacobian_forces_one_config, idx_val),
+#             total=len(idx_val),
+#         )
+#     )
+#     # Stack the Jacobian
+#     jac_for_val = np.empty((0, nparams))
+#     for jac in tqdm(jac_for_val_ragged):
+#         jac_for_val = np.row_stack((jac_for_val, jac))
+#     # Export this Jacobian
+#     np.save(jac_for_test_file, jac_for_test)
+#     np.save(jac_for_val_file, jac_for_val)
 
 
 # Combine the Jacobian
