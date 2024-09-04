@@ -8,6 +8,7 @@ import json
 import sys
 import shutil
 import subprocess
+import argparse
 
 import numpy as np
 import torch
@@ -31,27 +32,43 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 # Initial Setup
 # -------------
 
-# Command line arguments
-argv = sys.argv
-config_id = argv[1]
+# # Command line arguments
+# argv = sys.argv
+# config_id = argv[1]
 
 # Read setting file
+# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument("-c", "--cid", type=str, dest="config_id")
+arg_parser.add_argument("-p", "--partition", dest="partition")
+arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
+arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+arg_parser.add_argument("-d", "--dropout", type=float, default=0.1, dest="dropout")
+args = arg_parser.parse_args()
+settings = {
+    "partition": args.partition,
+    "Nlayers": args.nlayers,
+    "Nnodes": args.nnodes,
+    "dropout_ratio": args.dropout,
+}
+config_id = args.config_id
+
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
 DATA_DIR = ROOT_DIR / "data"
-with open(ROOT_DIR / "settings.json", "r") as f:
-    settings = json.load(f)
+# with open(ROOT_DIR / "settings.json", "r") as f:
+#     settings = json.load(f)
 partition = settings["partition"]
 
 # Architecture
 Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
 Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
-dropout_ratio = 0.1
+dropout_ratio = settings["dropout_ratio"]
 
 # Optimizer settings
 learning_rate = 0.001
 batch_size = 100
-nepochs_total = 50_000  # How many epochs to run in total
+nepochs_total = 40_000  # How many epochs to run in total
 nepochs_burnin = 2000  # Run this many epochs first
 nepochs_save_period = 10  # Then run and save every this many epochs
 
@@ -59,7 +76,12 @@ nepochs_save_period = 10  # Then run and save every this many epochs
 suffix = "_".join([str(n) for n in Nnodes])
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
 FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition_{suffix}"
+RES_DIR = (
+    WORK_DIR
+    / "results"
+    / f"training_d{dropout_ratio}"
+    / f"{partition}_partition_{suffix}"
+)
 if not RES_DIR.exists():
     RES_DIR.mkdir()
 META_DIR = RES_DIR / "metadata"
@@ -111,7 +133,7 @@ configs = tset.get_configs()
 nconfigs = len(configs)
 
 # calculator
-gpu = False
+gpu = True
 calc = CalculatorTorch(model, gpu=gpu)
 _ = calc.create(
     configs,
@@ -188,8 +210,8 @@ shutil.copy(best_model_file, RES_DIR / f"model_best_{config_id}.pkl")
 # Write KIM model
 kim_model_file = RES_DIR / f"DUNN_best_{config_id}"
 model.write_kim_model(kim_model_file)
-# (Re)Install best model
-subprocess.run(
-    ["kim-api-collections-management", "remove", "--force", kim_model_file.name]
-)
-subprocess.run(["kim-api-collections-management", "install", "user", str(kim_model_file)])
+# # (Re)Install best model
+# subprocess.run(
+#     ["kim-api-collections-management", "remove", "--force", kim_model_file.name]
+# )
+# subprocess.run(["kim-api-collections-management", "install", "user", str(kim_model_file)])

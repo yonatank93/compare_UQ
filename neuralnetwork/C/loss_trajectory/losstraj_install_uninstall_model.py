@@ -7,8 +7,9 @@ use fully connected model.
 ##########################################################################################
 from pathlib import Path
 import json
-import sys
+import argparse
 import subprocess
+from multiprocessing import Pool
 
 import numpy as np
 import torch
@@ -27,25 +28,33 @@ torch.manual_seed(seed)
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
-argv = sys.argv
-if len(argv) > 1:
-    # Mode argument is speciied
-    mode = argv[1]
-else:
-    mode = "install"
-
-
 ##########################################################################################
 # Initial Setup
 # -------------
 
-# Read setting file
+# Read settings
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
 DATA_DIR = ROOT_DIR / "data"
+
+# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument("-p", "--partition", dest="partition")
+arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
+arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+args = arg_parser.parse_args()
+# Read settings from file for missing arguments
 with open(ROOT_DIR / "settings.json", "r") as f:
-    settings = json.load(f)
-partition = settings["partition"]
+    settings_from_file = json.load(f)
+# Missing values
+if args.partition is None:
+    args.partition = settings_from_file["partition"]
+if args.nlayers is None:
+    args.nlayers = settings_from_file["Nlayers"]
+if args.nnodes is None:
+    args.nnodes = settings_from_file["Nnodes"]
+# Construct settings dictionary
+settings = {"partition": args.partition, "Nlayers": args.nlayers, "Nnodes": args.nnodes}
 
 # Architecture
 Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
@@ -53,6 +62,7 @@ Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
 dropout_ratio = 0.1
 
 # Directories
+partition = settings["partition"]
 suffix = "_".join([str(n) for n in Nnodes])
 TRAIN_MODEL_DIR = (
     ROOT_DIR
@@ -132,7 +142,6 @@ calc1 = CalculatorTorch(model1, gpu=gpu)
 calc2 = CalculatorTorch(model2, gpu=gpu)
 _ = calc1.create(
     configs,
-    nprocs=20,
     reuse=True,
     fingerprints_filename=FP_DIR / f"fingerprints_train.pkl",
     fingerprints_mean_stdev_filename=FP_DIR / f"fingerprints_train_mean_and_stdev.pkl",
@@ -167,9 +176,14 @@ sample_freq = 100
 
 
 ##########################################################################################
-# Write KIM model
-# ---------------
-for set_idx, epoch in enumerate(np.arange(burnin, 40000, sample_freq)):
+# Write and install KIM model
+# ---------------------------
+epoch_list = np.arange(burnin, 40000, sample_freq)
+
+
+def install_models(set_idx):
+    """Wrapper function to write and install KIM model given the set_idx."""
+    epoch = epoch_list[set_idx]
     SAMPLE_DIR = RES_DIR / f"{set_idx:03d}"
 
     # Load last parameters
@@ -185,20 +199,20 @@ for set_idx, epoch in enumerate(np.arange(burnin, 40000, sample_freq)):
         modelname = f"DUNN_C_losstraj_{set_idx:03d}"
         model2.write_kim_model(SAMPLE_DIR / modelname)
 
-        if mode == "install":
-            # Install
-            subprocess.run(
-                [
-                    "kim-api-collections-management",
-                    "install",
-                    "user",
-                    SAMPLE_DIR / modelname,
-                ]
-            )
-        elif mode == "uninstall":
-            # Uninstall
-            subprocess.run(
-                ["kim-api-collections-management", "remove", "--force", modelname]
-            )
+        # Uninstall first then install
+        subprocess.run(["kim-api-collections-management", "remove", "--force", modelname])
+        subprocess.run(
+            [
+                "kim-api-collections-management",
+                "install",
+                "user",
+                SAMPLE_DIR / modelname,
+            ]
+        )
     else:
-        continue
+        pass
+
+
+# Run
+with Pool(50) as p:
+    p.map(install_models, range(len(epoch_list)))

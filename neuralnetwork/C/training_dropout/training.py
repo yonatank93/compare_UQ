@@ -11,6 +11,7 @@ loss/rmse.
 from pathlib import Path
 from datetime import datetime
 import json
+import argparse
 
 import numpy as np
 import torch
@@ -36,17 +37,31 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 # Read setting file
+# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument("-p", "--partition", dest="partition")
+arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
+arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+arg_parser.add_argument("-d", "--dropout", type=float, default=0.1, dest="dropout")
+args = arg_parser.parse_args()
+settings = {
+    "partition": args.partition,
+    "Nlayers": args.nlayers,
+    "Nnodes": args.nnodes,
+    "dropout_ratio": args.dropout,
+}
+
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
 DATA_DIR = ROOT_DIR / "data"
-with open(ROOT_DIR / "settings.json", "r") as f:
-    settings = json.load(f)
+# with open(ROOT_DIR / "settings.json", "r") as f:
+#     settings = json.load(f)
 partition = settings["partition"]
 
 # Architecture
 Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
 Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
-dropout_ratio = 0.1
+dropout_ratio = settings["dropout_ratio"]  # Dropout ratio
 
 # Optimizer settings
 learning_rate = 1e-3
@@ -60,10 +75,15 @@ epoch_change_lr = 5000
 suffix = "_".join([str(n) for n in Nnodes])
 PART_DIR = DATA_DIR / f"{partition}_partition_data"
 FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / "training" / f"{partition}_partition_{suffix}"
+RES_DIR = (
+    WORK_DIR
+    / "results"
+    / f"training_d{dropout_ratio}"
+    / f"{partition}_partition_{suffix}"
+)
 if not RES_DIR.exists():
     print("Creating", RES_DIR)
-    RES_DIR.mkdir()
+    RES_DIR.mkdir(parents=True)
 META_DIR = RES_DIR / "metadata"
 MODEL_DIR = RES_DIR / "models"
 

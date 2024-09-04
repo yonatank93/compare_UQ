@@ -1,0 +1,86 @@
+"""Run (all) uncertainty propagation calculations using all architectures that we use."""
+
+from pathlib import Path
+import subprocess
+
+WORK_DIR = Path(__file__).absolute().parent
+
+# Iterables
+# Number of nodes in each hidden layer to try
+nnodes_try = [128]
+# Combinations of the number of nodes
+nnodes_comb = [
+    [n1, n2, n3] for n1 in nnodes_try for n2 in nnodes_try for n3 in nnodes_try
+]
+# List of dropout ratio
+dropout_list = [0.1, 0.2, 0.3, 0.4, 0.5]
+
+settings_list = [
+    {"partition": "mingjian", "Nlayers": 4, "Nnodes": nnodes, "dropout_ratio": ratio}
+    for nnodes in nnodes_comb
+    for ratio in dropout_list
+]
+
+# List of uncertainty propagation scripts
+scripts_list = [
+    "uncertainty_accuracy_energy_forces.py",
+    "uncertainty_energy_vs_latconst_diamond.py",
+    "uncertainty_energy_vs_latconst_graphene.py",
+    "uncertainty_energy_vs_latconst_graphite.py",
+    "uncertainty_latconst_ecoh_diamond.py",
+    "uncertainty_latconst_ecoh_graphene.py",
+    "uncertainty_latconst_ecoh_graphite.py",
+    "uncertainty_phonon_dispersion_diamond.py",
+    "uncertainty_phonon_dispersion_graphene.py",
+    "uncertainty_phonon_dispersion_graphite.py",
+    # "uncertainty_virial_stress_graphene.py",
+]
+
+# Dropout ratio
+dropout_ratio = 0.25
+
+for setting in settings_list:
+    print("Settings:", setting)
+    # Command line arguments
+    partition = setting["partition"]
+    Nnodes = setting["Nnodes"]
+    suffix = "_".join([str(n) for n in Nnodes])
+    args_str = (
+        f"-p {setting['partition']} "
+        + f"-l {setting['Nlayers']} "
+        + f"-n {' '.join([str(n) for n in setting['Nnodes']])} "
+        + f"-d {dropout_ratio}"
+    )
+
+    # Install the model for the selected architecture
+    kim_command = "kim-api-collections-management"
+    RES_DIR = (
+        WORK_DIR
+        / "results"
+        / f"training_d{dropout_ratio}"
+        / f"{partition}_partition_{'_'.join([str(n) for n in setting['Nnodes']])}"
+    )
+    modelname = "DUNN_best_train"
+    subprocess.run([kim_command, "remove", "--force", modelname])  # Uninstall
+    subprocess.run([kim_command, "install", "user", RES_DIR / modelname])  # Install
+
+    for script in scripts_list:
+        print("Script:", script)
+        if script == "uncertainty_accuracy_energy_forces.py":
+            # We need to further iterate over "test" and "training" mode
+            for mode in ["test", "training"]:
+                args_str_spec = args_str + f" -m {mode}"
+                command = f"time python {script} {args_str_spec}"
+        else:
+            command = f"time python {script} {args_str}"
+        # Run
+        subprocess.run(command, shell=True)
+
+# # If running in cluster, make sure to exit after everything is done. This is so that we
+# # don't just let the cluster idle
+# # Get machine name
+# process = subprocess.run("hostname", stdout=subprocess.PIPE)
+# hostname = process.stdout.decode("utf-8")
+# # Exits if running not in login node
+# if not "login" in hostname:
+#     subprocess.run(f"scancel $SLURM_JOB_ID", shell=True)
