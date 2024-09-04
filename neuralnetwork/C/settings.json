@@ -3,7 +3,8 @@
     "Nlayers": 4,
     "Nnodes": [
         128,
-        128,
-        128
-    ]
+	128,
+	128
+    ],
+    "dropout_ratio": 0.1
 }

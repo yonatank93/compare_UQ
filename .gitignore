@@ -48,6 +48,9 @@ kliff.log
 log.lammps
 lammps.in
 
+# Slurm output files
+slurm_files/
+
 # Large data
 neuralnetwork/C/data/phonon*
 neuralnetwork/C/data/results
