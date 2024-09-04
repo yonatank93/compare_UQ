@@ -49,6 +49,7 @@ log.lammps
 lammps.in
 
 # Slurm output files
+slurm-*.out
 slurm_files/
 
 # Large data
