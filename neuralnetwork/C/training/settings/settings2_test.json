@@ -1,8 +1,6 @@
 {
     "dataset": {
-        "dataset_path": [
-            "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_test_set"
-        ],
+        "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_test_set",
         "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
     },
     "architecture": {

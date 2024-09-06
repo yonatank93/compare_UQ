@@ -4,6 +4,7 @@ or test data (specified through the CLI argument).
 
 ##########################################################################################
 from pathlib import Path
+import re
 import json
 import sys
 import shutil
@@ -69,7 +70,7 @@ nepochs_save_period = 10  # Then run and save every this many epochs
 nepochs_total = nepochs_list[-1]  # How many epochs to run in total
 
 # Directories to store results
-RES_DIR = WORK_DIR / "results" / settings_path.with_suffix("").name
+RES_DIR = WORK_DIR / "results" / re.match(r"^[^_\.]+", settings_path.name).group()
 if not RES_DIR.exists():
     RES_DIR.mkdir(parents=True)
 MODEL_DIR = RES_DIR / "models"

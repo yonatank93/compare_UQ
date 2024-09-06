@@ -107,7 +107,8 @@ for name, settings in new_settings_dict.items():
     settings_test = copy.deepcopy(settings)
     settings_test["dataset"]["dataset_path"] = (
         "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_test_set",
-    )
+    )[0]
+
     with open(SETTINGS_DIR / f"{name}_test.json", "w") as f:
         json.dump(settings_test, f, indent=4)
 
@@ -156,7 +157,7 @@ echo "All Done!"
 
     # Write
     slurm_file = "training_submit_job.sh"
-    with open(slurm_file, "w") as f:
-        f.write(slurm_commands)
+    # with open(slurm_file, "w") as f:
+    #     f.write(slurm_commands)
     # Submit job
     # subprocess.run(["sbatch", slurm_file])
