@@ -8,6 +8,7 @@ import json
 
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
+SETTINGS_DIR = ROOT_DIR / "settings"
 
 # Iterables - Generate a list of settings
 # Dataset
@@ -64,10 +65,10 @@ for dp, fp in zip(dataset_path, fingerprints_path):
 
 # Export the settings
 # Import default settings
-with open(ROOT_DIR / "settings0.json", "r") as f:
+with open(SETTINGS_DIR / "settings0.json", "r") as f:
     settings0 = json.load(f)
 # Import the previously exported settings list. This file is used to prevent duplicates
-old_settings_file = WORK_DIR / "settings_list.json"
+old_settings_file = SETTINGS_DIR / "settings_list.json"
 if old_settings_file.exists():
     with open(old_settings_file, "r") as f:
         old_settings_dict = json.load(f)

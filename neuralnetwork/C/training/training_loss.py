@@ -35,11 +35,12 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
+SETTINGS_DIR = ROOT_DIR / "settings"
 
 # Read command line argument
 arg_parser = argparse.ArgumentParser("Settings of the calculations")
 arg_parser.add_argument(
-    "-s", "--settings-path", default=ROOT_DIR / "settings0.json", dest="settings_path"
+    "-s", "--settings-path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
 )
 args = arg_parser.parse_args()
 settings_path = Path(args.settings_path)

@@ -8,10 +8,11 @@ import subprocess
 
 
 WORK_DIR = Path(__file__).absolute().parent
-SETTINGS_DIR = WORK_DIR / "settings"
+ROOT_DIR = WORK_DIR.parent
+SETTINGS_DIR = ROOT_DIR / "settings"
 
 # Iterales - Get the files listed in the settings folder
-settings_files = glob(str(SETTINGS_DIR / "settings*.json"))
+settings_files = glob(str(SETTINGS_DIR / "settings[0-9]*.json"))
 
 # Slurm job template
 slurm_tpl = """#!/bin/bash
