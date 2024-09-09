@@ -31,8 +31,8 @@ Nlayers_list = [len(n) + 1 for n in Nnodes_list]
 dropout_list = [0.1]  # [0.1, 0.2, 0.3, 0.4, 0.5]
 
 # Optimizer
-batch_size_list = [10, 50, 100, 500, 1000]  # [100]
-lr_list = [[1e-3, 1e-4]]
+batch_size_list = [1000]  # [, 50, 100, 500, 1000]  # [100]
+lr_list = [[1e-2, 1e-3]]
 nepochs_list = [[5000, 40000]]
 
 # Iterate over all these lists and create a list of settings
@@ -93,7 +93,6 @@ with open(old_settings_file, "w") as f:
 
 
 # Iterate over the settings and submit jobs
-SETTINGS_DIR = WORK_DIR / "settings"  # Folder to store all the settings json files
 if not SETTINGS_DIR.exists():
     SETTINGS_DIR.mkdir()
 
@@ -156,9 +155,9 @@ echo "All Done!"
         args_str,
     )
 
-    # Write
-    slurm_file = "training_submit_job.sh"
+    # # Write
+    # slurm_file = "training_submit_job.sh"
     # with open(slurm_file, "w") as f:
     #     f.write(slurm_commands)
-    # Submit job
+    # # Submit job
     # subprocess.run(["sbatch", slurm_file])
