@@ -267,8 +267,8 @@ for structure in structures:
         # Some plotting constants
         xdata = ref_for[:, ii]
         ydata = ens_for_mean[:, ii]
-        for_max = np.max(xdata)
-        for_min = np.min(xdata)
+        for_max = np.max([xdata, ydata])
+        for_min = np.min([xdata, ydata])
         for_range = for_max - for_min
         axis_min = for_min - 0.1 * for_range
         axis_max = for_max + 0.1 * for_range

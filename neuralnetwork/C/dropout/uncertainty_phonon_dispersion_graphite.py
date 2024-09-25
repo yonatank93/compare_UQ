@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the dropout ensembles.
 
 # In[1]:
 
@@ -16,7 +16,7 @@ from tqdm import tqdm
 import sys
 from multiprocessing import Pool
 
-from ase import Atoms
+from ase.lattice.hexagonal import Graphite
 from ase.calculators.kim import KIM
 from ase.phonons import Phonons
 from ase.visualize import view
@@ -59,12 +59,10 @@ if not PLOT_DIR.exists():
 
 
 # Graphite sheet
-a0 = 2.466
-c0 = 3.348
-cell = a0 * np.array([[1, 0, 0], [0.5, np.sqrt(3) / 2, 0], [0, 0, c0 / a0]])
-positions = np.array([cell[0], 1 / 3 * cell[0] + 1 / 3 * cell[1]])
-atoms = Atoms("2C", positions=positions, cell=cell, pbc=[1, 1, 1])
-# view(atoms.repeat((4, 4, 2)))
+a0 = 2.46
+c0 = 6.7
+atoms = Graphite("C", latticeconstant={"a": a0, "c": c0})
+# view(atoms.repeat((4, 4, 1)))
 
 
 # In[4]:

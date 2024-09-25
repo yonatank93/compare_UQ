@@ -80,8 +80,8 @@ else:
         )
 
     energy_latconst_ensembles = np.array(energy_latconst_ensembles).astype(float)
-    energy_latconst_mean_do = np.mean(energy_latconst_ensembles, axis=0)
-    energy_latconst_error_do = np.std(energy_latconst_ensembles, axis=0)
+    energy_latconst_mean = np.mean(energy_latconst_ensembles, axis=0)
+    energy_latconst_error = np.std(energy_latconst_ensembles, axis=0)
     np.savez(
         preds_samples_file,
         alist=alist,
@@ -93,11 +93,11 @@ else:
 # In[5]:
 
 
-energy_mean_do = np.mean(energy_ensembles, axis=0)
-energy_error_do = np.std(energy_ensembles, axis=0)
+energy_mean = np.mean(energy_ensembles, axis=0)
+energy_error = np.std(energy_ensembles, axis=0)
 
-latconst_mean_do = np.mean(latconst_ensembles, axis=0)
-latconst_error_do = np.std(latconst_ensembles, axis=0)
+latconst_mean = np.mean(latconst_ensembles, axis=0)
+latconst_error = np.std(latconst_ensembles, axis=0)
 
 
 # In[6]:
@@ -110,12 +110,12 @@ plt.figure()
 # Dropout
 plt.fill_between(
     alist,
-    energy_mean_do - energy_error_do,
-    energy_mean_do + energy_error_do,
+    energy_mean - energy_error,
+    energy_mean + energy_error,
     alpha=0.5,
     color="tab:orange",
 )
-plt.plot(alist, energy_mean_do, "-", color="tab:orange", label="DUNN dropout")
+plt.plot(alist, energy_mean, "-", color="tab:orange", label="DUNN dropout")
 # plt.ylim(-8.12, -7.25)
 plt.xlabel(r"Lattice constant $a$ $(\AA)$")
 plt.ylabel("Energy (eV/atom)")
@@ -134,12 +134,12 @@ plt.figure()
 # Dropout
 plt.fill_between(
     alist,
-    latconst_mean_do - latconst_error_do,
-    latconst_mean_do + latconst_error_do,
+    latconst_mean - latconst_error,
+    latconst_mean + latconst_error,
     alpha=0.5,
     color="tab:orange",
 )
-plt.plot(alist, latconst_mean_do, "-", color="tab:orange", label="DUNN dropout")
+plt.plot(alist, latconst_mean, "-", color="tab:orange", label="DUNN dropout")
 # plt.ylim(-8.12, -7.25)
 plt.xlabel(r"Lattice constant $a$ $(\AA)$")
 plt.ylabel(r"Lattice constant $c$ $(\AA)$")

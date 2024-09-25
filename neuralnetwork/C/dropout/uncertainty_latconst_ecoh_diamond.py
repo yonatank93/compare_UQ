@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the equilibrium lattice constant and the cohesive energy from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the equilibrium lattice constant and the cohesive energy from the dropout ensembles.
 
 # In[1]:
 
@@ -18,11 +18,7 @@ from multiprocessing import Pool
 import numpy as np
 import matplotlib.pyplot as plt
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
-# plt.style.use("default")
-
 WORK_DIR = Path(__file__).absolute().parent
-RES_DIR = WORK_DIR / "results" / "dropout"
 sys.path.append(str(WORK_DIR.parent))
 
 

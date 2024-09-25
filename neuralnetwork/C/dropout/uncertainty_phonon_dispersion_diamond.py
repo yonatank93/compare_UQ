@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the dropout ensembles.
 
 # In[1]:
 

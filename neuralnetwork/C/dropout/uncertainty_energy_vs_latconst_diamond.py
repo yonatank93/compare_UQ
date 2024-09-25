@@ -77,16 +77,16 @@ else:
         energy_ensembles = list(p.map(energyvslatconst_wrapper, range(100)))
 
     energy_ensembles = energy_ensembles = np.array(energy_ensembles).astype(float)
-    energy_mean_do = np.mean(energy_ensembles, axis=0)
-    energy_error_do = np.std(energy_ensembles, axis=0)
+    energy_mean = np.mean(energy_ensembles, axis=0)
+    energy_error = np.std(energy_ensembles, axis=0)
     np.savez(preds_samples_file, alist=alist, energy_ensembles=energy_ensembles)
 
 
 # In[5]:
 
 
-energy_mean_do = np.mean(energy_ensembles, axis=0)
-energy_error_do = np.std(energy_ensembles, axis=0)
+energy_mean = np.mean(energy_ensembles, axis=0)
+energy_error = np.std(energy_ensembles, axis=0)
 
 
 # In[6]:
@@ -99,12 +99,12 @@ plt.figure()
 # Dropout
 plt.fill_between(
     alist,
-    energy_mean_do - energy_error_do,
-    energy_mean_do + energy_error_do,
+    energy_mean - energy_error,
+    energy_mean + energy_error,
     alpha=0.5,
     color="tab:orange",
 )
-plt.plot(alist, energy_mean_do, "-", color="tab:orange", label="DUNN dropout")
+plt.plot(alist, energy_mean, "-", color="tab:orange", label="DUNN dropout")
 plt.ylim(-8.12, -7.25)
 plt.xlabel(r"Lattice constant $a$ $(\AA)$")
 plt.ylabel("Energy (eV/atom)")

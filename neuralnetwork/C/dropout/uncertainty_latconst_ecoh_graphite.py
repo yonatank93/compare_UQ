@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the equilibrium lattice constant and the cohesive energy from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the equilibrium lattice constant and the cohesive energy from the dropout ensembles.
 
 # In[1]:
 
@@ -17,11 +17,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
-# plt.style.use("default")
-
 WORK_DIR = Path(__file__).absolute().parent
-RES_DIR = WORK_DIR / "results" / "dropout"
 sys.path.append(str(WORK_DIR.parent))
 
 
@@ -68,8 +64,8 @@ else:
     c0_list = []
     e0_list = []
 
-    ainit = 2.466  # From materials project for graphite-like structure
-    cinit = 3.348  # From https://doi.org/10.1073/pnas.2134173100
+    ainit = 2.46  # From materials project for graphite-like structure
+    cinit = 6.7  # From https://doi.org/10.1073/pnas.2134173100
     for ii in tqdm(range(100)):
         # Equilibration
         a0, c0, e0 = equilibrate_graphite(
