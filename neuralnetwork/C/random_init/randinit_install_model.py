@@ -7,8 +7,9 @@ dropout and just want to use fully connected model.
 ##########################################################################################
 from pathlib import Path
 import json
-import sys
+import argparse
 import subprocess
+from multiprocessing import Pool
 
 import numpy as np
 import torch
@@ -16,7 +17,6 @@ import torch
 from kliff import nn
 from kliff.calculators import CalculatorTorch
 from kliff.dataset import Dataset
-from kliff.dataset.weight import Weight
 from kliff.descriptors import SymmetryFunction
 from kliff.models import NeuralNetwork
 
@@ -27,37 +27,50 @@ torch.manual_seed(seed)
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 
-argv = sys.argv
-if len(argv) > 1:
-    # Mode argument is speciied
-    mode = argv[1]
-else:
-    mode = "install"
-
-
 ##########################################################################################
 # Initial Setup
 # -------------
 
-# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
-DATA_DIR = ROOT_DIR / "data"
-with open(ROOT_DIR / "settings.json", "r") as f:
+SETTINGS_DIR = ROOT_DIR / "settings"
+
+# Read command line argument
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument(
+    "-p", "--path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
+)
+args = arg_parser.parse_args()
+settings_path = Path(args.settings_path)
+# Load settings from json file
+with open(settings_path, "r") as f:
     settings = json.load(f)
-partition = settings["partition"]
+
+# Read settings
+# Dataset
+dataset_path = Path(settings["dataset"]["dataset_path"])  # Path to the dataset
+FP_DIR = Path(settings["dataset"]["fingerprints_path"])  # Path to the fingerprint files
 
 # Architecture
-Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
-Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
+Nlayers = settings["architecture"]["Nlayers"]  # Number of layers, including output
+Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden layer
+dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
-# Directories
-suffix = "_".join([str(n) for n in Nnodes])
-PART_DIR = DATA_DIR / f"{partition}_partition_data"
-FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
+# Optimizer settings
+batch_size = settings["optimizer"]["batch_size"]
+# We use the first learning rate up to epoch number listed as the first element of
+# nepochs_list. Then, we use the second learning rate up to the second nepochs.
+lr_list = settings["optimizer"]["learning_rate"]
+nepochs_list = settings["optimizer"]["nepochs"]
+
+nepochs_initial = 2000  # Run this many epochs first before start saving the model
+nepochs_save_period = 10  # Then run and save every this many epochs
+nepochs_total = nepochs_list[-1]  # How many epochs to run in total
+
+# Directories to store results
+RES_DIR = WORK_DIR / "results" / settings_path.with_suffix("").name
 if not RES_DIR.exists():
-    RES_DIR.mkdir()
+    RES_DIR.mkdir(parents=True)
 
 
 ##########################################################################################
@@ -73,6 +86,7 @@ model = NeuralNetwork(descriptor)
 # Layers
 hidden_layer_mappings = []
 for ii in range(Nlayers - 2):
+    hidden_layer_mappings.append(nn.Dropout(dropout_ratio))
     hidden_layer_mappings.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings.append(nn.Tanh())
 
@@ -83,6 +97,7 @@ model.add_layers(
     # hidden layer(s)
     *hidden_layer_mappings,  # Mappings between hidden layers in the middle
     # hidden layer(s)
+    nn.Dropout(dropout_ratio),  # Mapping from the last hidden layer to the output layer
     nn.Linear(Nnodes[-1], 1),
     # output layer
 )
@@ -93,7 +108,6 @@ model.add_layers(
 # ---------------------------
 
 # training set
-dataset_path = PART_DIR / "carbon_training_set"
 tset = Dataset(dataset_path)
 configs = tset.get_configs()
 
@@ -112,7 +126,7 @@ _ = calc.create(
 ##########################################################################################
 # Write KIM model
 # ---------------
-for set_idx in range(100):
+def install_model_given_idx(set_idx):
     SAMPLE_DIR = RES_DIR / f"{set_idx:03d}"
 
     # Load last parameters
@@ -124,20 +138,17 @@ for set_idx in range(100):
         modelname = f"DUNN_C_randinit_{set_idx:03d}"
         model.write_kim_model(SAMPLE_DIR / modelname)
 
-        if mode == "install":
-            # Install
-            subprocess.run(
-                [
-                    "kim-api-collections-management",
-                    "install",
-                    "user",
-                    SAMPLE_DIR / modelname,
-                ]
-            )
-        elif mode == "uninstall":
-            # Uninstall
-            subprocess.run(
-                ["kim-api-collections-management", "remove", "--force", modelname]
-            )
-    else:
-        continue
+        # Install
+        subprocess.run(
+            [
+                "kim-api-collections-management",
+                "install",
+                "--force",
+                "user",
+                SAMPLE_DIR / modelname,
+            ]
+        )
+
+
+with Pool(25) as p:
+    p.map(install_model_given_idx, range(100))

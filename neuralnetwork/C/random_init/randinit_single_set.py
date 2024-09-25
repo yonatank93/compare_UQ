@@ -14,6 +14,8 @@ import sys
 import json
 import os
 import re
+import argparse
+from pprint import pprint
 
 import numpy as np
 import torch
@@ -26,49 +28,59 @@ from kliff.descriptors import SymmetryFunction
 from kliff.loss import Loss
 from kliff.models import NeuralNetwork
 
-# Random seed
-argv = sys.argv
-seed = int(argv[1])
-np.random.seed(seed)
-# torch.set_default_tensor_type(torch.DoubleTensor)
-
 
 ##########################################################################################
 # Initial Setup
 # -------------
 
-
-# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
-DATA_DIR = ROOT_DIR / "data"
-with open(ROOT_DIR / "settings.json", "r") as f:
+SETTINGS_DIR = ROOT_DIR / "settings"
+
+# Read command line argument
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument(
+    "-s", "--settings-path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
+)
+arg_parser.add_argument("-i", "--seed", type=int, dest="seed")
+args = arg_parser.parse_args()
+settings_path = Path(args.settings_path)
+seed = args.seed
+# Random seed
+np.random.seed(seed)
+# Load settings from json file
+with open(settings_path, "r") as f:
     settings = json.load(f)
-partition = settings["partition"]
+print("Train a NN model with the following settings:")
+pprint(settings)
+
+
+# Read settings
+# Dataset
+dataset_path = Path(settings["dataset"]["dataset_path"])  # Path to the dataset
+FP_DIR = Path(settings["dataset"]["fingerprints_path"])  # Path to the fingerprint files
 
 # Architecture
-Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
-Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
-dropout_ratio = 0.1
-
-# Directories
-suffix = "_".join([str(n) for n in Nnodes])
-PART_DIR = DATA_DIR / f"{partition}_partition_data"
-FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
-if not RES_DIR.exists():
-    RES_DIR.mkdir()
-MODEL_DIR = RES_DIR / "models"
-if not MODEL_DIR.exists():
-    MODEL_DIR.mkdir()
+Nlayers = settings["architecture"]["Nlayers"]  # Number of layers, including output
+Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden layer
+dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
 # Optimizer settings
-learning_rate = 1e-3
-batch_size = 100
-nepochs_total = 40_000  # How many epochs to run in total
-nepochs_initial = 2000  # Run this many epochs first
+batch_size = settings["optimizer"]["batch_size"]
+# We use the first learning rate up to epoch number listed as the first element of
+# nepochs_list. Then, we use the second learning rate up to the second nepochs.
+lr_list = settings["optimizer"]["learning_rate"]
+nepochs_list = settings["optimizer"]["nepochs"]
+
+nepochs_initial = 2000  # Run this many epochs first before start saving the model
 nepochs_save_period = 10  # Then run and save every this many epochs
-epoch_change_lr = 5000  # This is the epoch when we change the learning rate
+nepochs_total = nepochs_list[-1]  # How many epochs to run in total
+
+# Directories to store results
+RES_DIR = WORK_DIR / "results" / settings_path.with_suffix("").name / f"{seed:03d}"
+if not RES_DIR.exists():
+    RES_DIR.mkdir(parents=True)
+MODEL_DIR = RES_DIR / "models"
 
 
 ##########################################################################################
@@ -122,7 +134,6 @@ for layer in layers:
 # ---------------------------
 
 # training set
-dataset_path = PART_DIR / "carbon_training_set"
 weight = Weight(energy_weight=1.0, forces_weight=np.sqrt(0.1))
 tset = Dataset(dataset_path, weight)
 configs = tset.get_configs()
@@ -151,72 +162,48 @@ loss = Loss(calc, residual_data=residual_data)
 # Training
 # --------
 
-# Check if there some training has previously partially done
-numeric_const_pattern = r"""
-    [-+]? # optional sign
-    (?:
-        (?: \d* \. \d+ ) # .1 .12 .123 etc 9.1 etc 98.1 etc
-        |
-        (?: \d+ \.? ) # 1. 12. 123. etc 1 12 123 etc
-    )
-    # followed by optional exponent part if desired
-    (?: [Ee] [+-]? \d+ ) ?
-    """
-rx = re.compile(numeric_const_pattern, re.VERBOSE)
-# If some training has been done, MODEL_DIR might not be empty. It is for sure empty if no
-# training was done previously.
-model_fnames = os.listdir(MODEL_DIR)
-if len(model_fnames) == 0:
-    # Fresh training
-    start_epoch = 0
+# First, train the model for 2000 epochs, then export the result. This is like the burn-in
+# period.
+minimize_setting = dict(
+    start_epoch=0, num_epochs=nepochs_initial, batch_size=batch_size, lr=lr_list[0]
+)
+trained_model_file = MODEL_DIR / f"model_epoch{nepochs_initial}.pkl"
+
+if trained_model_file.exists():
+    model.load(trained_model_file)
 else:
-    epochs_done = [int(float(rx.findall(fname)[0])) for fname in model_fnames]
-    last_epoch = max(epochs_done)
-    start_epoch = last_epoch + 1
-
-    # Update the parameters to the last result
-    model_fname = MODEL_DIR / f"model_epoch{int(last_epoch)}.pkl"
-    model.load(model_fname)
-
-minimize_setting = dict(batch_size=batch_size)
-
-# Run training
-if start_epoch < epoch_change_lr:
-    # First, train the model using lr=1e-3
-    print(
-        f"Run initial training for upto {epoch_change_lr} epochs "
-        f"using learning rate {learning_rate:0.1e}"
-    )
-    minimize_setting = dict(
-        start_epoch=start_epoch,
-        num_epochs=epoch_change_lr,
-        lr=learning_rate,
-    )
+    print(f"Run initial training for {nepochs_initial} epochs")
     start_time = datetime.now()
-    _ = loss.minimize(method="Adam", **minimize_setting)
+    result = loss.minimize(method="Adam", **minimize_setting)
     end_time = datetime.now()
-    start_epoch = epoch_change_lr + 1
     print("Initial training time:", end_time - start_time)
 
+# After that, we continue training for the specified total number of epochs, but we also
+# export the model every 10 epochs.
+ii = 0
+ilr = 0  # Index to get the learning rate
+nepochs_done = nepochs_initial
+while nepochs_done < nepochs_total:
+    start_epoch = nepochs_initial + ii * nepochs_save_period + 1
+    num_epochs = nepochs_save_period - 1
+    nepochs_done = start_epoch + num_epochs
+    minimize_setting.update({"start_epoch": start_epoch, "num_epochs": num_epochs})
 
-if start_epoch < nepochs_total:
-    # After that, we continue training using lr=1e-4
-    num_epochs = nepochs_total - start_epoch
-    learning_rate *= 0.1
-    minimize_setting.update(
-        dict(start_epoch=start_epoch, num_epochs=num_epochs, lr=learning_rate)
-    )
+    if start_epoch > nepochs_list[ilr]:
+        ilr += 1
+        minimize_setting.update({"lr": lr_list[ilr]})
 
-    print(
-        f"Run the second stage of training for {num_epochs} epochs "
-        f"using learning rate {learning_rate:0.1e}"
-    )
+    trained_model_file = MODEL_DIR / f"model_epoch{nepochs_done}.pkl"
+    if trained_model_file.exists():
+        model.load(trained_model_file)
+    else:
+        start_time = datetime.now()
+        result = loss.minimize(method="Adam", **minimize_setting)
+        end_time = datetime.now()
+        print(f"Training time up to epochs {nepochs_done}: {end_time - start_time}")
 
-    start_time = datetime.now()
-    _ = loss.minimize(method="Adam", **minimize_setting)
-    end_time = datetime.now()
-    start_epoch = epoch_change_lr + 1
-    print("Initial training time:", end_time - start_time)
+    ii += 1
+    print(start_epoch, nepochs_done)
 
 # Export the parameters from the last epoch
 last_params = calc.get_opt_params()
