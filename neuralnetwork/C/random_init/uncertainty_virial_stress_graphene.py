@@ -66,7 +66,7 @@ stress_ens = np.zeros((100, len(alist), 6))
 
 for ii in tqdm(range(100)):
     path = RES_DIR / f"{ii:03d}" / "virial_stress_graphene"
-    modelname = f"DUNN_losstraj_{ii:03d}"
+    modelname = f"DUNN_randinit_{ii:03d}"
     stress_ens[ii] = virialvslatconst(modelname, alist, None, path)
 
 # Convert the stress data unit into GPa
