@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import argparse
 
 import numpy as np
 import torch
@@ -24,27 +25,47 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 # Initial Setup
 # -------------
 
-# Read setting file
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
-DATA_DIR = ROOT_DIR / "data"
-with open(ROOT_DIR / "settings.json", "r") as f:
+SETTINGS_DIR = ROOT_DIR / "settings"
+
+# Read command line argument
+arg_parser = argparse.ArgumentParser("Settings of the calculations")
+arg_parser.add_argument(
+    "-s", "--settings-path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
+)
+args = arg_parser.parse_args()
+settings_path = Path(args.settings_path)
+# Load settings from json file
+with open(settings_path, "r") as f:
     settings = json.load(f)
-partition = settings["partition"]
+
+# Read settings
+# Dataset
+dataset_path = Path(settings["dataset"]["dataset_path"])  # Path to the dataset
+FP_DIR = Path(settings["dataset"]["fingerprints_path"])  # Path to the fingerprint files
 
 # Architecture
-Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
-Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
-dropout_ratio = 0.1
-
-# Directories
-PART_DIR = DATA_DIR / f"{partition}_partition_data"
-FP_DIR = PART_DIR / "fingerprints"
-
+Nlayers = settings["architecture"]["Nlayers"]  # Number of layers, including output
+Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden layer
+dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
 # Optimizer settings
-learning_rate = 0.001
-batch_size = 100
+batch_size = settings["optimizer"]["batch_size"]
+# We use the first learning rate up to epoch number listed as the first element of
+# nepochs_list. Then, we use the second learning rate up to the second nepochs.
+lr_list = settings["optimizer"]["learning_rate"]
+nepochs_list = settings["optimizer"]["nepochs"]
+
+nepochs_initial = 2000  # Run this many epochs first before start saving the model
+nepochs_save_period = 10  # Then run and save every this many epochs
+nepochs_total = nepochs_list[-1]  # How many epochs to run in total
+
+# Directories to store results
+RES_DIR = WORK_DIR / "results" / settings_path.with_suffix("").name
+if not RES_DIR.exists():
+    RES_DIR.mkdir(parents=True)
+
 
 ##########################################################################################
 # Model
@@ -58,7 +79,7 @@ model = NeuralNetwork(descriptor)
 
 # Layers
 hidden_layer_mappings = []
-for _ in range(Nlayers - 2):
+for ii in range(Nlayers - 2):
     hidden_layer_mappings.append(nn.Dropout(dropout_ratio))
     hidden_layer_mappings.append(nn.Linear(Nnodes[ii], Nnodes[ii + 1]))
     hidden_layer_mappings.append(nn.Tanh())
@@ -81,7 +102,6 @@ model.add_layers(
 # ---------------------------
 
 # training set
-dataset_path = PART_DIR / "carbon_training_set"
 weight = Weight(energy_weight=1.0, forces_weight=np.sqrt(0.1))
 tset = Dataset(dataset_path, weight)
 configs = tset.get_configs()
@@ -115,7 +135,7 @@ BS = BootstrapNeuralNetworkModel(loss, seed=seed)
 # Try to load the data from previous calculations
 # Bootstrap compute arguments samples
 nsamples_target = 100
-bootstrap_fingerprints_file = Path(f"bootstrap_fingerprints_{partition}.json")
+bootstrap_fingerprints_file = Path(RES_DIR / f"bootstrap_fingerprints.json")
 if bootstrap_fingerprints_file.exists():
     BS.load_bootstrap_compute_arguments(bootstrap_fingerprints_file)
 else:
