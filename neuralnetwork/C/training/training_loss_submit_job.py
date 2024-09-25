@@ -11,8 +11,8 @@ WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
 SETTINGS_DIR = ROOT_DIR / "settings"
 
-# Iterales - Get the files listed in the settings folder
-settings_files = glob(str(SETTINGS_DIR / "settings[0-9]*.json"))
+# Iterables - Get the files listed in the settings folder
+settings_files = [str(SETTINGS_DIR / f"settings{ii}.json") for ii in range(13)]
 
 # Slurm job template
 slurm_tpl = """#!/bin/bash

@@ -1,6 +1,6 @@
 {
     "dataset": {
-        "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_test_set",
+        "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
         "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
     },
     "architecture": {
@@ -13,10 +13,10 @@
         "dropout_ratio": 0.1
     },
     "optimizer": {
-        "batch_size": 1000,
+        "batch_size": 50,
         "learning_rate": [
-            0.01,
-            0.001,
+            0.0005,
+            5e-05,
             0.0001
         ],
         "nepochs": [
