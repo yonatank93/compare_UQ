@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the snapshot ensembles.
 
 # In[1]:
 
@@ -9,10 +9,11 @@
 from pathlib import Path
 import pickle
 import json
+import re
+import argparse
 from datetime import datetime
 from tqdm import tqdm
 import sys
-import argparse
 from multiprocessing import Pool
 
 from ase.build import bulk
@@ -23,7 +24,7 @@ from ase.visualize import view
 import numpy as np
 import matplotlib.pyplot as plt
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
+# get_ipython().run_line_magic("matplotlib", "inline")
 # plt.style.use("default")
 
 
@@ -33,29 +34,22 @@ import matplotlib.pyplot as plt
 # Read settings
 WORK_DIR = Path().absolute()
 ROOT_DIR = WORK_DIR.parent
-DATA_DIR = ROOT_DIR / "data"
+SETTINGS_DIR = ROOT_DIR / "settings"
 
-# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
-arg_parser = argparse.ArgumentParser("Settings of the calculations")
-arg_parser.add_argument("-p", "--partition", dest="partition")
-arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
-arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+# Command line argument
+arg_parser = argparse.ArgumentParser("Settings file path")
+arg_parser.add_argument(
+    "-p", "--path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
+)
 args = arg_parser.parse_args()
-if len(sys.argv) > 1:
-    # Command line arguments present
-    settings = {
-        "partition": args.partition,
-        "Nlayers": args.nlayers,
-        "Nnodes": args.nnodes,
-    }
-else:
-    # No command line arguments, read setting file
-    with open(ROOT_DIR / "settings.json", "r") as f:
-        settings = json.load(f)
 
-partition = settings["partition"]
-suffix = "_".join([str(n) for n in settings["Nnodes"]])
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
+settings_path = Path(args.settings_path)
+with open(settings_path, "r") as f:
+    settings = json.load(f)
+
+RES_DIR = WORK_DIR / "results" / re.match(r"^[^_\.]+", settings_path.name).group()
+if not RES_DIR.exists():
+    RES_DIR.mkdir(parents=True)
 PLOT_DIR = RES_DIR / "plots"
 if not PLOT_DIR.exists():
     PLOT_DIR.mkdir(parents=True)

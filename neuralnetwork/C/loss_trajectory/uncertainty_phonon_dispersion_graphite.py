@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the snapshot ensembles.
 
 # In[1]:
 
@@ -9,13 +9,14 @@
 from pathlib import Path
 import pickle
 import json
+import re
+import argparse
 from datetime import datetime
 from tqdm import tqdm
 import sys
-import argparse
 from multiprocessing import Pool
 
-from ase import Atoms
+from ase.lattice.hexagonal import Graphite
 from ase.calculators.kim import KIM
 from ase.phonons import Phonons
 from ase.visualize import view
@@ -33,29 +34,22 @@ import matplotlib.pyplot as plt
 # Read settings
 WORK_DIR = Path().absolute()
 ROOT_DIR = WORK_DIR.parent
-DATA_DIR = ROOT_DIR / "data"
+SETTINGS_DIR = ROOT_DIR / "settings"
 
-# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
-arg_parser = argparse.ArgumentParser("Settings of the calculations")
-arg_parser.add_argument("-p", "--partition", dest="partition")
-arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
-arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+# Command line argument
+arg_parser = argparse.ArgumentParser("Settings file path")
+arg_parser.add_argument(
+    "-p", "--path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
+)
 args = arg_parser.parse_args()
-if len(sys.argv) > 1:
-    # Command line arguments present
-    settings = {
-        "partition": args.partition,
-        "Nlayers": args.nlayers,
-        "Nnodes": args.nnodes,
-    }
-else:
-    # No command line arguments, read setting file
-    with open(ROOT_DIR / "settings.json", "r") as f:
-        settings = json.load(f)
 
-partition = settings["partition"]
-suffix = "_".join([str(n) for n in settings["Nnodes"]])
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
+settings_path = Path(args.settings_path)
+with open(settings_path, "r") as f:
+    settings = json.load(f)
+
+RES_DIR = WORK_DIR / "results" / re.match(r"^[^_\.]+", settings_path.name).group()
+if not RES_DIR.exists():
+    RES_DIR.mkdir(parents=True)
 PLOT_DIR = RES_DIR / "plots"
 if not PLOT_DIR.exists():
     PLOT_DIR.mkdir(parents=True)
@@ -65,12 +59,10 @@ if not PLOT_DIR.exists():
 
 
 # Graphite sheet
-a0 = 2.466
-c0 = 3.348
-cell = a0 * np.array([[1, 0, 0], [0.5, np.sqrt(3) / 2, 0], [0, 0, c0 / a0]])
-positions = np.array([cell[0], 1 / 3 * cell[0] + 1 / 3 * cell[1]])
-atoms = Atoms("2C", positions=positions, cell=cell, pbc=[1, 1, 1])
-# view(atoms.repeat((4, 4, 2)))
+a0 = 2.46
+c0 = 6.7
+atoms = Graphite("C", latticeconstant={"a": a0, "c": c0})
+# view(atoms.repeat((4, 4, 1)))
 
 
 # In[4]:
@@ -136,6 +128,7 @@ labels = list(bs.get_labels())
 labels[2] = [r"$\Gamma$", r"$M$", r"$K$", r"$\Gamma$"]
 mean_energies = np.mean(energies, axis=0)
 error_energies = np.std(energies, axis=0)
+nbands = mean_energies.shape[-1]
 
 
 # In[7]:
@@ -156,15 +149,16 @@ with open(RES_DIR / "uncertainty_phonon_dispersion_graphite.pkl", "wb") as f:
 colors = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown"]
 plt.figure()
 
-for ii, eng in enumerate(mean_energies.T):
+for ii in range(0, nbands, 2):
+    eng = mean_energies[:, 11]
     plt.fill_between(
         labels[0],
         eng - error_energies[:, ii],
         eng + error_energies[:, ii],
-        color=colors[ii],
+        color=colors[int(ii / 2)],
         alpha=0.3,
     )
-    plt.plot(labels[0], eng, c=colors[ii])
+    plt.plot(labels[0], eng, c=colors[int(ii / 2)])
 
 for xcoord, name in zip(labels[1], labels[2]):
     plt.axvline(xcoord, c="k", ls="--")

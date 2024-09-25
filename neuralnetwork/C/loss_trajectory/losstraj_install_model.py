@@ -32,49 +32,46 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 # Initial Setup
 # -------------
 
-# Read settings
 WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
-DATA_DIR = ROOT_DIR / "data"
+SETTINGS_DIR = ROOT_DIR / "settings"
 
-# settings = {"partition": "mingjian", "Nlayers": 4, "Nnodes": [128, 128, 128]}
+# Read command line argument
 arg_parser = argparse.ArgumentParser("Settings of the calculations")
-arg_parser.add_argument("-p", "--partition", dest="partition")
-arg_parser.add_argument("-l", "--nlayers", type=int, dest="nlayers")
-arg_parser.add_argument("-n", "--nnodes", nargs="+", type=int, dest="nnodes")
+arg_parser.add_argument(
+    "-p", "--path", default=SETTINGS_DIR / "settings0.json", dest="settings_path"
+)
 args = arg_parser.parse_args()
-# Read settings from file for missing arguments
-with open(ROOT_DIR / "settings.json", "r") as f:
-    settings_from_file = json.load(f)
-# Missing values
-if args.partition is None:
-    args.partition = settings_from_file["partition"]
-if args.nlayers is None:
-    args.nlayers = settings_from_file["Nlayers"]
-if args.nnodes is None:
-    args.nnodes = settings_from_file["Nnodes"]
-# Construct settings dictionary
-settings = {"partition": args.partition, "Nlayers": args.nlayers, "Nnodes": args.nnodes}
+settings_path = Path(args.settings_path)
+# Load settings from json file
+with open(settings_path, "r") as f:
+    settings = json.load(f)
+# Training result directory
+TRAIN_DIR = ROOT_DIR / "training" / "results" / settings_path.with_suffix("").name
+
+# Read settings
+# Dataset
+dataset_path = Path(settings["dataset"]["dataset_path"])  # Path to the dataset
+FP_DIR = Path(settings["dataset"]["fingerprints_path"])  # Path to the fingerprint files
 
 # Architecture
-Nlayers = settings["Nlayers"]  # Number of layers, excluding input, including output
-Nnodes = settings["Nnodes"]  # Number of nodes for each hidden layer
-dropout_ratio = 0.1
+Nlayers = settings["architecture"]["Nlayers"]  # Number of layers, including output
+Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden layer
+dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
-# Directories
-partition = settings["partition"]
-suffix = "_".join([str(n) for n in Nnodes])
-TRAIN_MODEL_DIR = (
-    ROOT_DIR
-    / "training_dropout"
-    / "results"
-    / "training"
-    / f"{partition}_partition_{suffix}"
-    / "models"
-)
-PART_DIR = DATA_DIR / f"{partition}_partition_data"
-FP_DIR = PART_DIR / "fingerprints"
-RES_DIR = WORK_DIR / "results" / f"{partition}_partition_{suffix}"
+# Optimizer settings
+batch_size = settings["optimizer"]["batch_size"]
+# We use the first learning rate up to epoch number listed as the first element of
+# nepochs_list. Then, we use the second learning rate up to the second nepochs.
+lr_list = settings["optimizer"]["learning_rate"]
+nepochs_list = settings["optimizer"]["nepochs"]
+
+nepochs_initial = 2000  # Run this many epochs first before start saving the model
+nepochs_save_period = 10  # Then run and save every this many epochs
+nepochs_total = nepochs_list[-1]  # How many epochs to run in total
+
+# Directories to store results
+RES_DIR = WORK_DIR / "results" / settings_path.with_suffix("").name
 if not RES_DIR.exists():
     RES_DIR.mkdir(parents=True)
 
@@ -132,7 +129,6 @@ model2.add_layers(
 # ---------------------------
 
 # training set
-dataset_path = PART_DIR / "carbon_training_set"
 tset = Dataset(dataset_path)
 configs = tset.get_configs()
 
@@ -158,17 +154,17 @@ _ = calc2.create(
 ##########################################################################################
 # Analyze autocorrelation
 # -----------------------
-# I think it is save to set the burn-in to be 30_000 epochs. If we look at the training
+# I think it is save to set to just use the last 10_000 epochs. If we look at the training
 # cost, the cost has already plateaued after epoch 30_000.
-burnin = 30_000
+burnin = nepochs_total - 10_000
 
 # Load the training loss data
-loss_train = np.loadtxt(TRAIN_MODEL_DIR.parent / "loss_values_train.txt")
+loss_train = np.loadtxt(TRAIN_DIR / "loss_values_train.txt")
 idx_samples = np.where(loss_train[:, 0] >= burnin)[0]
 loss_samples = loss_train[idx_samples, 1]
 
 # Estimate the autocorrelation length
-acorr_est = integrated_time(loss_samples.reshape((-1, 1)))
+acorr_est = integrated_time(loss_samples, c=1, has_walkers=False, quiet=True)
 print("Estimated autocorrelation length:", acorr_est)
 # The estimated autocorrelation length is pretty low; it is less than 1.0. So, it is save
 # to sample every 100 epochs.
@@ -178,7 +174,9 @@ sample_freq = 100
 ##########################################################################################
 # Write and install KIM model
 # ---------------------------
-epoch_list = np.arange(burnin, 40000, sample_freq)
+epoch_list = np.arange(burnin, nepochs_total, sample_freq) + sample_freq
+# We added sample_freq so that in exclude burnin point (e.g., epoch 30,000) and include
+# last point (e.g., epoch 40,000)
 
 
 def install_models(set_idx):
@@ -187,7 +185,8 @@ def install_models(set_idx):
     SAMPLE_DIR = RES_DIR / f"{set_idx:03d}"
 
     # Load last parameters
-    model_file = TRAIN_MODEL_DIR / f"final_model_dropout_epochs{epoch}.pkl"
+    model_file = TRAIN_DIR / "models" / f"model_epoch{epoch}.pkl"
+    print(set_idx, model_file.exists())
     if model_file.exists():
         # Load the model and get the parameters. We will use these parameters to load the
         # parameters into the second model without dropout.
@@ -199,20 +198,18 @@ def install_models(set_idx):
         modelname = f"DUNN_C_losstraj_{set_idx:03d}"
         model2.write_kim_model(SAMPLE_DIR / modelname)
 
-        # Uninstall first then install
-        subprocess.run(["kim-api-collections-management", "remove", "--force", modelname])
+        # Install
         subprocess.run(
             [
                 "kim-api-collections-management",
                 "install",
+                "--force",
                 "user",
                 SAMPLE_DIR / modelname,
             ]
         )
-    else:
-        pass
 
 
 # Run
-with Pool(50) as p:
+with Pool(25) as p:
     p.map(install_models, range(len(epoch_list)))
