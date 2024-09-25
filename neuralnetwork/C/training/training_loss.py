@@ -60,7 +60,7 @@ Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden l
 dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
 # Optimizer settings
-batch_size = settings["optimizer"]["batch_size"]
+batch_size = 1  # Set batch size 1 so that we won't divide by batch size
 # We use the first learning rate up to epoch number listed as the first element of
 # nepochs_list. Then, we use the second learning rate up to the second nepochs.
 lr_list = settings["optimizer"]["learning_rate"]
@@ -150,32 +150,38 @@ loss_values_file = RES_DIR / f"loss_values_{config_id}.txt"
 if loss_values_file.exists():
     loss_values = np.loadtxt(loss_values_file)
 else:
+    loss_values = np.empty((0, 2))
+
+if nepochs_initial not in loss_values[:, 0]:
     # Evaluate the model at the end of the bur-in period.
     trained_model_file = MODEL_DIR / f"model_epoch{nepochs_initial}.pkl"
     model.load(trained_model_file)
-    loss_values = [nepochs_initial, loss._get_loss_epoch(loader)]
+    loss_values = np.vstack(
+        (loss_values, [nepochs_initial, loss._get_loss_epoch(loader)])
+    )
 
-    # Continue evaluating the loss for the rest of the training trajectory.
-    ii = 0
-    nepochs_done = nepochs_initial
-    while nepochs_done < nepochs_total:
-        try:
-            start_epoch = nepochs_initial + ii * nepochs_save_period + 1
-            num_epochs = nepochs_save_period - 1
-            nepochs_done = start_epoch + num_epochs
+# Continue evaluating the loss for the rest of the training trajectory.
+ii = 0
+nepochs_done = nepochs_initial
+while nepochs_done < nepochs_total:
+    try:
+        start_epoch = nepochs_initial + ii * nepochs_save_period + 1
+        num_epochs = nepochs_save_period - 1
+        nepochs_done = start_epoch + num_epochs
 
+        if nepochs_done not in loss_values[:, 0]:
             trained_model_file = MODEL_DIR / f"model_epoch{nepochs_done}.pkl"
             model.load(trained_model_file)
-            loss_values = np.row_stack(
+            loss_values = np.vstack(
                 (loss_values, [nepochs_done, loss._get_loss_epoch(loader)])
             )
-            ii += 1
-            print(start_epoch, nepochs_done)
-        except Exception as e:
-            print(e)
-            break
+        ii += 1
+        print(start_epoch, nepochs_done)
+    except Exception as e:
+        print(e)
+        break
 
-        np.savetxt(loss_values_file, loss_values)
+np.savetxt(loss_values_file, loss_values)
 
 
 # Best model
