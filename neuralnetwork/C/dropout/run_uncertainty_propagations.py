@@ -10,9 +10,12 @@ SETTINGS_DIR = ROOT_DIR / "settings"
 TRAIN_DIR = ROOT_DIR / "training"
 
 # Iterables
-# List of settings file paths - paths to settings<0-4>.json, which are the only settings
-# files that correspond to this method
-settings_path_list = [str(SETTINGS_DIR / f"settings{ii}.json") for ii in range(5)]
+# List of settings file paths
+settings_path_list = [str(SETTINGS_DIR / f"settings{ii}.json") for ii in range(9)]
+# settings_path_list = [
+#     str(SETTINGS_DIR / f"settings{sid}.json")
+#     for sid in ["0c3", "1c2", "2c2", "3c1", "4c1"]
+# ]
 
 # List of uncertainty propagation scripts
 scripts_list = [
@@ -27,7 +30,7 @@ scripts_list = [
     "uncertainty_phonon_dispersion_graphene.py",
     "uncertainty_phonon_dispersion_graphite.py",
     # "uncertainty_virial_stress_graphene_submitjobs.py",  # To run the calculation
-    "uncertainty_virial_stress_graphene.py",  # To post-process
+    # "uncertainty_virial_stress_graphene.py",  # To post-process
 ]
 
 # Iteration

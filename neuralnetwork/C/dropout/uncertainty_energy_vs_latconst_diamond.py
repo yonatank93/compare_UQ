@@ -24,7 +24,7 @@ sys.path.append(str(WORK_DIR.parent))
 # In[2]:
 
 
-from energyvslatconst import energyvslatconst
+from energyvslatconst.energyvslatconst import energyvslatconst
 
 
 # In[3]:
@@ -55,14 +55,16 @@ if not PLOT_DIR.exists():
 
 # In[4]:
 
+# DFT data
+dft_data = np.loadtxt(ROOT_DIR / "energyvslatconst/dft_data/diamond.txt", delimiter=",")
+
 
 ##########################################################################################
 # Dropout
 # -------
 # Compute the energy ensembles
 potential = "DUNN_best_train"
-ainit = 3.56
-alist = np.linspace(0.93, 1.09, 21) * ainit
+alist = dft_data[:, 0]
 preds_samples_file = RES_DIR / "uncertainty_energy_vs_latconst_diamond.npz"
 if preds_samples_file.exists():
     preds_data = np.load(preds_samples_file)

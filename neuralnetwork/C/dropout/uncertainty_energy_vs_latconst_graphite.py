@@ -24,7 +24,7 @@ sys.path.append(str(WORK_DIR.parent))
 # In[2]:
 
 
-from energyvslatconst import energyvslatconst
+from energyvslatconst.energyvslatconst import energyvslatconst
 
 
 # In[3]:
@@ -55,15 +55,27 @@ if not PLOT_DIR.exists():
 
 # In[4]:
 
+# DFT data
+dft_data = np.loadtxt(ROOT_DIR / "energyvslatconst/dft_data/graphite.txt", delimiter=",")
+
 
 ##########################################################################################
 # Dropout
 # -------
 # Compute the energy ensembles
 potential = "DUNN_best_train"
-ainit = 2.466
-alist = np.linspace(0.93, 1.09, 21) * ainit
-preds_samples_file = RES_DIR / "uncertainty_energy_vs_latconst_graphite.npz"
+# alist = dft_data[:, 0]
+# Extend alist
+a0 = 2.466
+alist_scaled = np.linspace(0.93, 1.09, 21)
+diff = 0.008
+# Left
+alist_scaled = np.append(np.arange(-15, 0) * diff + alist_scaled[0], alist_scaled)
+# Right
+alist_scaled = np.append(alist_scaled, np.arange(1, 15) * diff + alist_scaled[-1])
+alist = alist_scaled * a0
+
+preds_samples_file = RES_DIR / "uncertainty_energy_vs_latconst_graphite_extended.npz"
 if preds_samples_file.exists():
     preds_data = np.load(preds_samples_file)
     energy_ensembles = preds_data["energy_ensembles"]
@@ -80,13 +92,13 @@ else:
         )
 
     energy_latconst_ensembles = np.array(energy_latconst_ensembles).astype(float)
-    energy_latconst_mean = np.mean(energy_latconst_ensembles, axis=0)
-    energy_latconst_error = np.std(energy_latconst_ensembles, axis=0)
+    energy_ensembles = energy_latconst_ensembles[:, 1]
+    latconst_ensembles = energy_latconst_ensembles[:, 2]
     np.savez(
         preds_samples_file,
         alist=alist,
-        energy_ensembles=energy_latconst_ensembles[:, 1],
-        latconst_ensembles=energy_latconst_ensembles[:, 2],
+        energy_ensembles=energy_ensembles,
+        latconst_ensembles=latconst_ensembles,
     )
 
 
@@ -106,6 +118,7 @@ latconst_error = np.std(latconst_ensembles, axis=0)
 # Plot the result curves
 # Energy vs lattice constant
 plt.figure()
+plt.plot(*(dft_data[:, [0, 2]].T), "r.", zorder=10, label="DFT")
 
 # Dropout
 plt.fill_between(
@@ -130,6 +143,7 @@ plt.close()
 # Plot the result curves
 # latconst vs lattice constant
 plt.figure()
+plt.plot(*(dft_data[:, [0, 1]].T), "r.", zorder=10, label="DFT")
 
 # Dropout
 plt.fill_between(

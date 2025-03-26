@@ -78,7 +78,7 @@ def phonon_wrapper(set_idx):
     calc = KIM(potential)
     calc.set_parameters(active_member_id=[[0], [set_idx + 1]])
     ph = Phonons(
-        atoms, calc, supercell=(7, 7, 7), delta=0.1, name=sample_dir / "phonon_diamond"
+        atoms, calc, supercell=(8, 8, 8), delta=0.01, name=sample_dir / "phonon_diamond"
     )
     ph.run()
 
@@ -86,7 +86,7 @@ def phonon_wrapper(set_idx):
     ph.read(acoustic=True)
     # ph.clean()
 
-    path = atoms.cell.bandpath("GXKGL", npoints=100)
+    path = atoms.cell.bandpath("GXUGL", npoints=100)
     bs = ph.get_band_structure(path)
     return bs.energies
 
@@ -113,7 +113,7 @@ ph = Phonons(
 )
 ph.run()
 ph.read(acoustic=True)
-path = atoms.cell.bandpath("GXKGL", npoints=100)
+path = atoms.cell.bandpath("GXUGL", npoints=100)
 bs = ph.get_band_structure(path)
 
 
@@ -125,7 +125,7 @@ conversion = 4.136e-3  # 1 Thz = 4.136 meV
 energies /= conversion
 
 labels = list(bs.get_labels())
-labels[2] = [r"$\Gamma$", r"$X$", r"$K$", r"$\Gamma$", r"$L$"]
+labels[2] = [r"$\Gamma$", r"$X$", r"$U$", r"$\Gamma$", r"$L$"]
 mean_energies = np.mean(energies, axis=0)
 error_energies = np.std(energies, axis=0)
 
