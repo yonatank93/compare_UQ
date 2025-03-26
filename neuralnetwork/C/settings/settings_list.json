@@ -11,10 +11,13 @@
                 128,
                 128
             ],
-            "dropout_ratio": 0.1
+            "dropout_ratio": 0.9
         },
         "optimizer": {
-            "batch_size": 100,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
                 0.001,
                 0.0001
@@ -40,7 +43,10 @@
             "dropout_ratio": 0.2
         },
         "optimizer": {
-            "batch_size": 100,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
                 0.001,
                 0.0001
@@ -66,7 +72,10 @@
             "dropout_ratio": 0.3
         },
         "optimizer": {
-            "batch_size": 100,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
                 0.001,
                 0.0001
@@ -92,7 +101,10 @@
             "dropout_ratio": 0.4
         },
         "optimizer": {
-            "batch_size": 100,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
                 0.001,
                 0.0001
@@ -118,7 +130,10 @@
             "dropout_ratio": 0.5
         },
         "optimizer": {
-            "batch_size": 100,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
                 0.001,
                 0.0001
@@ -129,7 +144,7 @@
             ]
         }
     },
-    "settings5": {
+    "settings16": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -144,18 +159,24 @@
             "dropout_ratio": 0.1
         },
         "optimizer": {
-            "batch_size": 10,
+            "batch_size": [
+                500,
+                500,
+                500
+            ],
             "learning_rate": [
-                0.001,
+                0.005,
+                0.0005,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000
+                40000,
+                50000
             ]
         }
     },
-    "settings6": {
+    "settings15": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -170,18 +191,24 @@
             "dropout_ratio": 0.1
         },
         "optimizer": {
-            "batch_size": 50,
+            "batch_size": [
+                50,
+                50,
+                50
+            ],
             "learning_rate": [
-                0.001,
+                0.0005,
+                5e-05,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000
+                40000,
+                50000
             ]
         }
     },
-    "settings7": {
+    "settings14": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -196,18 +223,24 @@
             "dropout_ratio": 0.1
         },
         "optimizer": {
-            "batch_size": 500,
+            "batch_size": [
+                10,
+                10,
+                10
+            ],
             "learning_rate": [
-                0.001,
+                0.0001,
+                1e-05,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000
+                40000,
+                50000
             ]
         }
     },
-    "settings8": {
+    "settings13": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -222,7 +255,100 @@
             "dropout_ratio": 0.1
         },
         "optimizer": {
-            "batch_size": 1000,
+            "batch_size": [
+                1000,
+                1000,
+                1000
+            ],
+            "learning_rate": [
+                0.01,
+                0.001,
+                0.0001
+            ],
+            "nepochs": [
+                5000,
+                40000,
+                50000
+            ]
+        }
+    },
+    "settings12": {
+        "dataset": {
+            "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
+            "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
+        },
+        "architecture": {
+            "Nlayers": 4,
+            "Nnodes": [
+                128,
+                128,
+                128
+            ],
+            "dropout_ratio": 0.1
+        },
+        "optimizer": {
+            "batch_size": [
+                1000,
+                1000
+            ],
+            "learning_rate": [
+                0.001,
+                0.0001
+            ],
+            "nepochs": [
+                5000,
+                40000
+            ]
+        }
+    },
+    "settings11": {
+        "dataset": {
+            "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
+            "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
+        },
+        "architecture": {
+            "Nlayers": 4,
+            "Nnodes": [
+                128,
+                128,
+                128
+            ],
+            "dropout_ratio": 0.1
+        },
+        "optimizer": {
+            "batch_size": [
+                500,
+                500
+            ],
+            "learning_rate": [
+                0.001,
+                0.0001
+            ],
+            "nepochs": [
+                5000,
+                40000
+            ]
+        }
+    },
+    "settings10": {
+        "dataset": {
+            "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
+            "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
+        },
+        "architecture": {
+            "Nlayers": 4,
+            "Nnodes": [
+                128,
+                128,
+                128
+            ],
+            "dropout_ratio": 0.1
+        },
+        "optimizer": {
+            "batch_size": [
+                50,
+                50
+            ],
             "learning_rate": [
                 0.001,
                 0.0001
@@ -248,20 +374,21 @@
             "dropout_ratio": 0.1
         },
         "optimizer": {
-            "batch_size": 1000,
+            "batch_size": [
+                10,
+                10
+            ],
             "learning_rate": [
-                0.01,
                 0.001,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000,
-                50000
+                40000
             ]
         }
     },
-    "settings10": {
+    "settings5": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -273,23 +400,24 @@
                 128,
                 128
             ],
-            "dropout_ratio": 0.1
+            "dropout_ratio": 0.9
         },
         "optimizer": {
-            "batch_size": 10,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
-                0.0001,
-                1e-05,
+                0.001,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000,
-                50000
+                40000
             ]
         }
     },
-    "settings11": {
+    "settings6": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -301,23 +429,24 @@
                 128,
                 128
             ],
-            "dropout_ratio": 0.1
+            "dropout_ratio": 0.9
         },
         "optimizer": {
-            "batch_size": 50,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
-                0.0005,
-                5e-05,
+                0.001,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000,
-                50000
+                40000
             ]
         }
     },
-    "settings12": {
+    "settings7": {
         "dataset": {
             "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
             "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
@@ -329,19 +458,49 @@
                 128,
                 128
             ],
-            "dropout_ratio": 0.1
+            "dropout_ratio": 0.9
         },
         "optimizer": {
-            "batch_size": 500,
+            "batch_size": [
+                100,
+                100
+            ],
             "learning_rate": [
-                0.005,
-                0.0005,
+                0.001,
                 0.0001
             ],
             "nepochs": [
                 5000,
-                40000,
-                50000
+                40000
+            ]
+        }
+    },
+    "settings8": {
+        "dataset": {
+            "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
+            "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
+        },
+        "architecture": {
+            "Nlayers": 4,
+            "Nnodes": [
+                128,
+                128,
+                128
+            ],
+            "dropout_ratio": 0.9
+        },
+        "optimizer": {
+            "batch_size": [
+                100,
+                100
+            ],
+            "learning_rate": [
+                0.001,
+                0.0001
+            ],
+            "nepochs": [
+                5000,
+                40000
             ]
         }
     }

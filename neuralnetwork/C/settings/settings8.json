@@ -10,10 +10,13 @@
             128,
             128
         ],
-        "dropout_ratio": 0.1
+        "dropout_ratio": 0.9
     },
     "optimizer": {
-        "batch_size": 1000,
+        "batch_size": [
+            100,
+            100
+        ],
         "learning_rate": [
             0.001,
             0.0001
