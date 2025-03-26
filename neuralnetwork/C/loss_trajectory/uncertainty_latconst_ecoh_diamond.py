@@ -65,7 +65,7 @@ else:
 
     def equilibrate_diamond_wrapper(set_idx):
         potential = f"DUNN_C_losstraj_{set_idx:03d}"
-        return equilibrate_diamond(potential, ainit, active_member_id=0)
+        return equilibrate_diamond(potential, ainit)
 
     with Pool(25) as p:
         a0_e0_list = np.array(list(p.map(equilibrate_diamond_wrapper, range(100))))

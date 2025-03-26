@@ -11,15 +11,13 @@ SETTINGS_DIR = ROOT_DIR / "settings"
 TRAIN_DIR = ROOT_DIR / "training"
 
 # Iterables
-# List of settings file paths - settings that correspond to different hyperparameters for
-# the snapshots are settings 0, 5, 6, 7, and 8 (and 9 in the future)
-settings_path_list = [
-    str(SETTINGS_DIR / f"settings{ii}.json") for ii in [0, 9, 10, 11, 12]
-]
+settings_path_list = [SETTINGS_DIR / "settings0.json"]  # Only use the default settings
+# # List of settings file paths - settings that correspond to different hyperparameters for
+# # the snapshots are settings 0, 5, 6, 7, and 8 (and 9 in the future)
+# settings_path_list = [str(SETTINGS_DIR / f"settings{ii}c.json") for ii in range(5)]
 
 # List of uncertainty propagation scripts
 scripts_list = [
-    "uncertainty_accuracy_energy_forces.py",
     "uncertainty_energy_vs_latconst_diamond.py",
     "uncertainty_energy_vs_latconst_graphene.py",
     "uncertainty_energy_vs_latconst_graphite.py",
@@ -29,8 +27,9 @@ scripts_list = [
     "uncertainty_phonon_dispersion_diamond.py",
     "uncertainty_phonon_dispersion_graphene.py",
     "uncertainty_phonon_dispersion_graphite.py",
+    "uncertainty_accuracy_energy_forces.py",
     # "uncertainty_virial_stress_graphene_submitjobs.py",  # To run the calculation
-    "uncertainty_virial_stress_graphene_submitjobs.py",  # To post-process
+    # "uncertainty_virial_stress_graphene_submitjobs.py",  # To post-process
 ]
 
 # Iteration

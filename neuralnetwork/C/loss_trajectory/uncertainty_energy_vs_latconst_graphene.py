@@ -24,7 +24,7 @@ sys.path.append(str(WORK_DIR.parent))
 # In[2]:
 
 
-from energyvslatconst import energyvslatconst
+from energyvslatconst.energyvslatconst import energyvslatconst
 
 
 # In[3]:
@@ -57,7 +57,7 @@ if not PLOT_DIR.exists():
 
 
 # DFT data
-dft_data = np.loadtxt("../energyvslatconst/dft_data.txt", delimiter=",")
+dft_data = np.loadtxt("../energyvslatconst/dft_data/graphene.txt", delimiter=",")
 
 
 # In[5]:
@@ -67,9 +67,18 @@ dft_data = np.loadtxt("../energyvslatconst/dft_data.txt", delimiter=",")
 # Loss trajectory
 # ---------------
 # Compute the energy ensembles
-ainit = 2.466
-alist = np.linspace(0.93, 1.09, 21) * ainit
-preds_samples_file = RES_DIR / "uncertainty_energy_vs_latconst_graphene.npz"
+# alist = dft_data[:, 0]
+# Extend alist
+a0 = 2.466
+alist_scaled = np.linspace(0.93, 1.09, 21)
+diff = 0.008
+# Left
+alist_scaled = np.append(np.arange(-15, 0) * diff + alist_scaled[0], alist_scaled)
+# Right
+alist_scaled = np.append(alist_scaled, np.arange(1, 15) * diff + alist_scaled[-1])
+alist = alist_scaled * a0
+
+preds_samples_file = RES_DIR / "uncertainty_energy_vs_latconst_graphene_extended.npz"
 if preds_samples_file.exists():
     preds_data = np.load(preds_samples_file)
     energy_ensembles = preds_data["energy_ensembles"]

@@ -74,6 +74,7 @@ def phonon_wrapper(set_idx):
 
     # Phonon calculator
     calc = KIM(modelname)
+    calc.set_parameters(active_member_id=[[0], [0]])
     ph = Phonons(
         atoms,
         calc,
@@ -104,6 +105,7 @@ energies = energies[:, 0]
 # Get band structure
 # Phonon calculator
 calc = KIM("DUNN_C_losstraj_000")
+calc.set_parameters(active_member_id=[[0], [0]])
 ph = Phonons(
     atoms,
     calc,
