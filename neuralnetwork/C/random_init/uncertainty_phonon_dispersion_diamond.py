@@ -73,8 +73,9 @@ def phonon_wrapper(set_idx):
 
     # Phonon calculator
     calc = KIM(modelname)
+    calc.set_parameters(active_member_id=[[0], [0]])
     ph = Phonons(
-        atoms, calc, supercell=(7, 7, 7), delta=0.1, name=sample_dir / "phonon_diamond"
+        atoms, calc, supercell=(8, 8, 8), delta=0.01, name=sample_dir / "phonon_diamond"
     )
     ph.run()
 
@@ -99,6 +100,7 @@ energies = energies[:, 0]
 # Get band structure
 # Phonon calculator
 calc = KIM("DUNN_C_randinit_000")
+calc.set_parameters(active_member_id=[[0], [0]])
 ph = Phonons(
     atoms, calc, supercell=(7, 7, 7), delta=0.1, name=RES_DIR / "000" / "phonon_diamond"
 )

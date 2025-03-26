@@ -74,7 +74,7 @@ else:
     # Get all configurations
     configs_dict = {}
 
-    dataset_dir = PART_DIR / f"carbon_{mode}_set"
+    dataset_dir = Path(settings["dataset"]["dataset_path"])
     structures = os.listdir(dataset_dir)
     for struct in structures:
         substructures = os.listdir(dataset_dir / struct)
@@ -110,7 +110,10 @@ else:
             def compute_energy_forces_member(set_idx):
                 # Potential member
                 atoms_member = atoms.copy()
-                atoms_member.calc = KIM(f"DUNN_C_randinit_{set_idx:03d}")
+                calc = KIM(f"DUNN_C_randinit_{set_idx:03d}")
+                calc.set_parameters(active_member_id=[[0], [0]])
+                atoms_member.calc = calc
+
                 # Predictions
                 energy = atoms_member.get_potential_energy()
                 forces = atoms_member.get_forces()

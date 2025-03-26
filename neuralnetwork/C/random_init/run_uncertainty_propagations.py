@@ -16,7 +16,6 @@ settings_path_list = [SETTINGS_DIR / "settings0.json"]  # Only use the default s
 
 # List of uncertainty propagation scripts
 scripts_list = [
-    "uncertainty_accuracy_energy_forces.py",
     "uncertainty_energy_vs_latconst_diamond.py",
     "uncertainty_energy_vs_latconst_graphene.py",
     "uncertainty_energy_vs_latconst_graphite.py",
@@ -26,8 +25,9 @@ scripts_list = [
     "uncertainty_phonon_dispersion_diamond.py",
     "uncertainty_phonon_dispersion_graphene.py",
     "uncertainty_phonon_dispersion_graphite.py",
+    "uncertainty_accuracy_energy_forces.py",
     # "uncertainty_virial_stress_graphene_submitjobs.py",  # To run the calculation
-    "uncertainty_virial_stress_graphene.py",  # To post-process
+    # "uncertainty_virial_stress_graphene.py",  # To post-process
 ]
 
 # Iteration

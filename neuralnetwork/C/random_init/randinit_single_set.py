@@ -66,11 +66,12 @@ Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden l
 dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
 # Optimizer settings
-batch_size = settings["optimizer"]["batch_size"]
 # We use the first learning rate up to epoch number listed as the first element of
 # nepochs_list. Then, we use the second learning rate up to the second nepochs.
 lr_list = settings["optimizer"]["learning_rate"]
+bsize_list = settings["optimizer"]["batch_size"]
 nepochs_list = settings["optimizer"]["nepochs"]
+assert len(lr_list) == len(bsize_list) == len(nepochs_list)
 
 nepochs_initial = 2000  # Run this many epochs first before start saving the model
 nepochs_save_period = 10  # Then run and save every this many epochs
@@ -162,10 +163,10 @@ loss = Loss(calc, residual_data=residual_data)
 # Training
 # --------
 
-# First, train the model for 2000 epochs, then export the result. This is like the burn-in
-# period.
+# # First, train the model for 2000 epochs, then export the result. This is like the burn-in
+# # period.
 minimize_setting = dict(
-    start_epoch=0, num_epochs=nepochs_initial, batch_size=batch_size, lr=lr_list[0]
+    start_epoch=0, num_epochs=nepochs_initial, batch_size=bsize_list[0], lr=lr_list[0]
 )
 trained_model_file = MODEL_DIR / f"model_epoch{nepochs_initial}.pkl"
 
@@ -191,7 +192,7 @@ while nepochs_done < nepochs_total:
 
     if start_epoch > nepochs_list[ilr]:
         ilr += 1
-        minimize_setting.update({"lr": lr_list[ilr]})
+        minimize_setting.update({"lr": lr_list[ilr], "batch_size": bsize_list[ilr]})
 
     trained_model_file = MODEL_DIR / f"model_epoch{nepochs_done}.pkl"
     if trained_model_file.exists():
