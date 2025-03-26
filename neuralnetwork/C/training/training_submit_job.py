@@ -13,27 +13,36 @@ SETTINGS_DIR = ROOT_DIR / "settings"
 # Iterables - Generate a list of settings
 # Dataset
 dataset_path = [
-    "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
-    # "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/yonatan_partition_data/carbon_training_set",
+    "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/"
+    "mingjian_partition_data/carbon_training_set",
+    # "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/"
+    # "yonatan_partition_data/carbon_training_set",
 ]
 fingerprints_path = [
-    "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints",
-    # "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/yonatan_partition_data/fingerprints",
+    "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/"
+    "mingjian_partition_data/fingerprints",
+    # "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/"
+    # "yonatan_partition_data/fingerprints",
 ]
 
 # Architecture
 Nlayers_try = [4]  # Excluding input layer, including output layer
-Nnodes_try = [128]  # [64, 128,
+Nnodes_try = [128]
 Nnodes_list = []
 for Nlayers in Nlayers_try:
     Nnodes_list.extend(list(itertools.product(Nnodes_try, repeat=Nlayers - 1)))
 Nlayers_list = [len(n) + 1 for n in Nnodes_list]
-dropout_list = [0.1]  # [0.1, 0.2, 0.3, 0.4, 0.5]
+dropout_list = [0.3]  # [0.1, 0.2, 0.3, 0.4, 0.5]
 
 # Optimizer
-batch_size_list = [1000]  # [, 50, 100, 500, 1000]  # [100]
-lr_list = [[1e-2, 1e-3]]
-nepochs_list = [[5000, 40000]]
+batch_size_list = [
+    [10, 10, 10],
+    [50, 50, 50],
+    [500, 500, 500],
+    [1000, 1000, 1000],
+]
+lr_list = [[1e-4, 1e-5, 1e-4], [5e-4, 5e-5, 1e-4], [5e-3, 5e-4, 1e-4], [1e-2, 1e-3, 1e-4]]
+nepochs_list = [[5000, 30000, 40000]]
 
 # Iterate over all these lists and create a list of settings
 new_settings_list = []
@@ -120,7 +129,7 @@ for name, settings in new_settings_dict.items():
 
 #Submit this script with: sbatch thefilename
 
-#SBATCH --time=150:00:00   # walltime
+#SBATCH --time=70:00:00   # walltime
 #SBATCH --ntasks=2   # number of processor cores
 #SBATCH --nodes=1   # number of node
 #SBATCH --mem-per-cpu=20G   # memory per CPU core
@@ -155,9 +164,15 @@ echo "All Done!"
         args_str,
     )
 
-    # # Write
-    # slurm_file = "training_submit_job.sh"
-    # with open(slurm_file, "w") as f:
-    #     f.write(slurm_commands)
-    # # Submit job
-    # subprocess.run(["sbatch", slurm_file])
+    # Check if training has been completed. If it is, then there should be models.tar.gz
+    # file inside settings#/models directory
+    model_tarfile = WORK_DIR / "results" / name / "models" / "models.tar.gz"
+    if model_tarfile.exists():
+        print(f"Training for {name} has been completed. Skipping...")
+    else:
+        # Write
+        slurm_file = "training_submit_job.sh"
+        with open(slurm_file, "w") as f:
+            f.write(slurm_commands)
+        # Submit job
+        subprocess.run(["sbatch", slurm_file])

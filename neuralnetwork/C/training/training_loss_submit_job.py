@@ -12,7 +12,7 @@ ROOT_DIR = WORK_DIR.parent
 SETTINGS_DIR = ROOT_DIR / "settings"
 
 # Iterables - Get the files listed in the settings folder
-settings_files = [str(SETTINGS_DIR / f"settings{ii}.json") for ii in range(13)]
+settings_files = [str(SETTINGS_DIR / f"settings{ii}c.json") for ii in [0, 1, 2, 3, 4]]
 
 # Slurm job template
 slurm_tpl = """#!/bin/bash
@@ -32,7 +32,7 @@ slurm_tpl = """#!/bin/bash
 source ~/.bash_profile
 # echo "Load modules"
 # module purge
-# module restore kim_project_24
+module restore kim_project_24
 
 # source /fslhome/yonatank/local/bin/kim-api-activate
 # source /fslhome/yonatank/myenv3.8/bin/activate
@@ -57,7 +57,7 @@ slurm_file = "training_loss_submit_job.sh"
 # Submit jobs
 for settings_path in settings_files:
     # Use regular expression to find settings name
-    match = re.search(r"settings\d+", settings_path)
+    match = re.search(r"settings\d+.*", settings_path)
     name = match.group(0)
     RES_DIR = WORK_DIR / "results" / name  # Directory to store the results
 
@@ -68,13 +68,13 @@ for settings_path in settings_files:
     # Check if Job has been submitted
     cid = "test" if "test" in suffix else "train"
     filepath = RES_DIR / f"loss_values_{cid}.txt"
-    if not filepath.exists():
-        print(suffix, cid)
+    # if not filepath.exists():
+    print(suffix, cid)
 
-        # Render
-        slurm_commands = template.render(suffix=suffix, args_str=args_str)
-        # Write
-        with open(slurm_file, "w") as f:
-            f.write(slurm_commands)
-        # Submit job
-        subprocess.run(["sbatch", slurm_file])
+    # Render
+    slurm_commands = template.render(suffix=suffix, args_str=args_str)
+    # Write
+    with open(slurm_file, "w") as f:
+        f.write(slurm_commands)
+    # Submit job
+    subprocess.run(["sbatch", slurm_file])

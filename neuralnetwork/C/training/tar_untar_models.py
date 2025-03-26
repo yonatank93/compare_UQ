@@ -9,7 +9,7 @@ FILE_DIR = Path(__file__).absolute().parent
 RES_DIR = FILE_DIR / "results"
 
 # List the directories containing the model files
-model_dirs_list = [RES_DIR / f"settings{ii}" / "models" for ii in range(11)]
+model_dirs_list = [RES_DIR / f"settings{ii}" / "models" for ii in range(22)]
 
 # Command line argument
 arg_parser = argparse.ArgumentParser("Settings of the calculations")
@@ -23,9 +23,9 @@ for model_dir in model_dirs_list:
     os.chdir(model_dir)
     print(model_dir)
     if args.mode == "tar":
-        # # Tar
+        # Tar
         subprocess.run("tar -czf models.tar.gz model_epoch*.pkl", shell=True)
-        # Delete
+        # # Delete
         subprocess.run("rm model_epoch*.pkl", shell=True)
     elif args.mode == "untar":
         # Untar

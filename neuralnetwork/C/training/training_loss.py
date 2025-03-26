@@ -10,6 +10,8 @@ import sys
 import shutil
 import subprocess
 import argparse
+from glob import glob
+import re
 
 import numpy as np
 import torch
@@ -60,13 +62,15 @@ Nnodes = settings["architecture"]["Nnodes"]  # Number of nodes for each hidden l
 dropout_ratio = settings["architecture"]["dropout_ratio"]  # Dropout ratio
 
 # Optimizer settings
-batch_size = 1  # Set batch size 1 so that we won't divide by batch size
 # We use the first learning rate up to epoch number listed as the first element of
 # nepochs_list. Then, we use the second learning rate up to the second nepochs.
 lr_list = settings["optimizer"]["learning_rate"]
 nepochs_list = settings["optimizer"]["nepochs"]
+assert len(lr_list) == len(nepochs_list)
+batch_size = 1  # Set batch size 1 so that we won't divide by batch size
 
-nepochs_initial = 2000  # Run this many epochs first before start saving the model
+# nepochs_initial = 2000  # Run this many epochs first before start saving the model
+nepochs_initial = 0  # Run this many epochs first before start saving the model
 nepochs_save_period = 10  # Then run and save every this many epochs
 nepochs_total = nepochs_list[-1]  # How many epochs to run in total
 
@@ -116,7 +120,8 @@ if "train" in dataset_path.name:
     config_id = "train"
 elif "test" in dataset_path.name:
     config_id = "test"
-weight = Weight(energy_weight=1.0, forces_weight=np.sqrt(0.1))
+# weight = Weight(energy_weight=1.0, forces_weight=np.sqrt(0.1))
+weight = Weight(energy_weight=1.0, forces_weight=0.1)
 tset = Dataset(dataset_path, weight)
 configs = tset.get_configs()
 nconfigs = len(configs)
@@ -152,37 +157,32 @@ if loss_values_file.exists():
 else:
     loss_values = np.empty((0, 2))
 
-if nepochs_initial not in loss_values[:, 0]:
-    # Evaluate the model at the end of the bur-in period.
-    trained_model_file = MODEL_DIR / f"model_epoch{nepochs_initial}.pkl"
-    model.load(trained_model_file)
-    loss_values = np.vstack(
-        (loss_values, [nepochs_initial, loss._get_loss_epoch(loader)])
-    )
+# Collect the model files
+model_files = sorted(glob(str(MODEL_DIR / "model_epoch*.pkl")))
+# Get the epochs
+MODEL_DIR / f"model_epoch{nepochs_initial}.pkl"
+epochs_found = []
+for ff in model_files:
+    match = re.search(r"model_epoch(\d+).pkl", ff)
+    epochs_found = np.append(epochs_found, int(match.group(1)))
+# Only compute the loss up to the max nepochs, if more epochs are found
+epochs_found = epochs_found[epochs_found <= nepochs_total]
+# Sort
+epochs_found = epochs_found[epochs_found.argsort()].astype(int)
 
-# Continue evaluating the loss for the rest of the training trajectory.
-ii = 0
-nepochs_done = nepochs_initial
-while nepochs_done < nepochs_total:
-    try:
-        start_epoch = nepochs_initial + ii * nepochs_save_period + 1
-        num_epochs = nepochs_save_period - 1
-        nepochs_done = start_epoch + num_epochs
-
-        if nepochs_done not in loss_values[:, 0]:
-            trained_model_file = MODEL_DIR / f"model_epoch{nepochs_done}.pkl"
-            model.load(trained_model_file)
-            loss_values = np.vstack(
-                (loss_values, [nepochs_done, loss._get_loss_epoch(loader)])
-            )
-        ii += 1
-        print(start_epoch, nepochs_done)
-    except Exception as e:
-        print(e)
-        break
-
+# Compute loss for each epoch
+for epoch in epochs_found:
+    # Only compute the loss when the epoch hasn't been evaluated
+    if epoch not in loss_values[:, 0]:
+        trained_model_file = MODEL_DIR / f"model_epoch{epoch}.pkl"
+        model.load(trained_model_file)
+        append_val = [epoch, loss._get_loss_epoch(loader)]
+        # print(append_val)
+        loss_values = np.vstack((loss_values, append_val))
+# Make sure that the loss is sorted by epoch
+loss_values = loss_values[loss_values[:, 0].argsort()]
+# Export
 np.savetxt(loss_values_file, loss_values)
-
 
 # Best model
 idx = np.argmin(loss_values[:, 1])
@@ -195,8 +195,8 @@ shutil.copy(best_model_file, RES_DIR / f"model_best_{config_id}.pkl")
 # Write KIM model
 kim_model_file = RES_DIR / f"DUNN_best_{config_id}"
 model.write_kim_model(kim_model_file)
-# # (Re)Install best model
-# subprocess.run(
-#     ["kim-api-collections-management", "remove", "--force", kim_model_file.name]
-# )
-# subprocess.run(["kim-api-collections-management", "install", "user", str(kim_model_file)])
+# (Re)Install best model
+subprocess.run(
+    ["kim-api-collections-management", "remove", "--force", kim_model_file.name]
+)
+subprocess.run(["kim-api-collections-management", "install", "user", str(kim_model_file)])
