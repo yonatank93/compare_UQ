@@ -74,6 +74,7 @@ def phonon_wrapper(set_idx):
 
     # Phonon calculator
     calc = KIM(modelname)
+    calc.set_parameters(active_member_id=[[0], [0]])
     ph = Phonons(
         atoms,
         calc,
@@ -104,6 +105,7 @@ energies = energies[:, 0]
 # Get band structure
 # Phonon calculator
 calc = KIM("DUNN_C_bootstrap_000")
+calc.set_parameters(active_member_id=[[0], [0]])
 ph = Phonons(
     atoms,
     calc,
@@ -148,15 +150,16 @@ with open(RES_DIR / "uncertainty_phonon_dispersion_graphite.pkl", "wb") as f:
 colors = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown"]
 plt.figure()
 
-for ii, eng in enumerate(mean_energies.T):
+for ii in range(0, nbands, 2):
+    eng = mean_energies[:, 11]
     plt.fill_between(
         labels[0],
         eng - error_energies[:, ii],
         eng + error_energies[:, ii],
-        color=colors[ii],
+        color=colors[int(ii / 2)],
         alpha=0.3,
     )
-    plt.plot(labels[0], eng, c=colors[ii])
+    plt.plot(labels[0], eng, c=colors[int(ii / 2)])
 
 for xcoord, name in zip(labels[1], labels[2]):
     plt.axvline(xcoord, c="k", ls="--")

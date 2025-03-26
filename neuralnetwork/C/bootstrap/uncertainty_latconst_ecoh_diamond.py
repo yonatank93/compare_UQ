@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the equilibrium lattice constant and the cohesive energy from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the equilibrium lattice constant and the cohesive energy from the dropout ensembles.
 
 # In[1]:
 
@@ -18,7 +18,7 @@ from multiprocessing import Pool
 import numpy as np
 import matplotlib.pyplot as plt
 
-WORK_DIR = Path().absolute()
+WORK_DIR = Path(__file__).absolute().parent
 sys.path.append(str(WORK_DIR.parent))
 
 
@@ -65,7 +65,7 @@ else:
 
     def equilibrate_diamond_wrapper(set_idx):
         potential = f"DUNN_C_bootstrap_{set_idx:03d}"
-        return equilibrate_diamond(potential, ainit, active_member_id=0)
+        return equilibrate_diamond(potential, ainit)
 
     with Pool(25) as p:
         a0_e0_list = np.array(list(p.map(equilibrate_diamond_wrapper, range(100))))

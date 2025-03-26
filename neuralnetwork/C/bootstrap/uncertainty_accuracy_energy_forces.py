@@ -65,7 +65,6 @@ if not PLOT_DIR.exists():
 # Which data partition to use: "test" or "training"
 mode = "test" if "test" in settings_path.name else "training"
 uncertainty_energy_forces_file = RES_DIR / f"uncertainty_energy_forces_{mode}.pkl"
-calc = KIM("DUNN_best_train")
 
 if uncertainty_energy_forces_file.exists():
     with open(uncertainty_energy_forces_file, "rb") as f:
@@ -102,7 +101,6 @@ else:
         nid = len(identifiers)
         for ii, path in tqdm(enumerate(identifiers), desc=struct, total=nid):
             atoms = read(path)
-            atoms.calc = calc
             # Reference values
             ref_energy = atoms.info["Energy"]
             ref_forces = atoms.todict()["force"]
@@ -112,7 +110,9 @@ else:
             def compute_energy_forces_member(set_idx):
                 # Potential member
                 atoms_member = atoms.copy()
-                atoms_member.calc = KIM(f"DUNN_C_bootstrap_{set_idx:03d}")
+                calc = KIM(f"DUNN_C_bootstrap_{set_idx:03d}")
+                calc.set_parameters(active_member_id=[[0], [0]])
+                atoms_member.calc = calc
                 # Predictions
                 energy = atoms_member.get_potential_energy()
                 forces = atoms_member.get_forces()

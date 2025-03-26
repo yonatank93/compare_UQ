@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the bootstrap ensembles.
+# In this notebook, I want to compute the uncertainty of the phonon dispersion curves from the dropout ensembles.
 
 # In[1]:
 
@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt
 
 
 # Read settings
-WORK_DIR = Path().absolute()
+WORK_DIR = Path(__file__).absolute().parent
 ROOT_DIR = WORK_DIR.parent
 SETTINGS_DIR = ROOT_DIR / "settings"
 
@@ -61,20 +61,24 @@ if not PLOT_DIR.exists():
 # Diamond bulk
 a0 = 3.56
 atoms = bulk("C", "diamond", a0)
-# view(atoms.repeat((2, 2, 2)))
+# view(atoms.repeat((1, 1, 1)))
 
 
 # In[4]:
 
 
+potential = "DUNN_best_train"
+# potential = "DUNN_WenTadmor_2019v3_C__MO_714772088128_000"
+
+
 def phonon_wrapper(set_idx):
     sample_dir = RES_DIR / f"{set_idx:03d}"
-    modelname = f"DUNN_C_bootstrap_{set_idx:03d}"
 
     # Phonon calculator
-    calc = KIM(modelname)
+    calc = KIM(potential)
+    calc.set_parameters(active_member_id=[[0], [0]])
     ph = Phonons(
-        atoms, calc, supercell=(7, 7, 7), delta=0.1, name=sample_dir / "phonon_diamond"
+        atoms, calc, supercell=(8, 8, 8), delta=0.01, name=sample_dir / "phonon_diamond"
     )
     ph.run()
 
@@ -98,9 +102,14 @@ energies = energies[:, 0]
 
 # Get band structure
 # Phonon calculator
-calc = KIM("DUNN_C_bootstrap_000")
+calc = KIM(potential)
+calc.set_parameters(active_member_id=[[0], [0]])
 ph = Phonons(
-    atoms, calc, supercell=(7, 7, 7), delta=0.1, name=RES_DIR / "000" / "phonon_diamond"
+    atoms,
+    calc,
+    supercell=(7, 7, 7),
+    delta=0.1,
+    name=RES_DIR / "000" / "phonon_diamond",
 )
 ph.run()
 ph.read(acoustic=True)
