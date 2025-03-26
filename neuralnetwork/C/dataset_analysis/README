@@ -1,0 +1,6 @@
+# WARNING - DON'T DELETE THIS FOLDER FROM BOLYAI
+
+The file ``umap_reducer.pkl`` was exported from the trained reducer, which was
+trained in Bolyai. This file can be use to load the reducer, but it seems to be
+machine specific. The environment in RC doesn't seem to be able to load the
+reducer from this file.
