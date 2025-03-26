@@ -16,10 +16,10 @@ boundary	p p f
 # create a honeycomb lattice
 variable	a equal {{ a }}
 lattice		custom $a a1 1.0 0.0 0.0 &
-			  a2 0.5 $(sqrt(3.0)/2.0) 0.0 &
+			  a2 -0.5 $(sqrt(3.0)/2.0) 0.0 &
 			  a3 0.0 0.0 1.0 &
 			  basis 0.0 0.0 0.0 &
-			  basis $(1.0/3.0) $(1.0/3.0) 0.0 &
+			  basis $(1.0/3.0) $(2.0/3.0) 0.0 &
 			  spacing 1.0 $(sqrt(3.0)/2.0) 1.0
 # create simulation box and atoms
 region		reg prism 0 1 0 1 0 1 0.5 0 0 units lattice
