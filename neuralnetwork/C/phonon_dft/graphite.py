@@ -4,10 +4,15 @@ graphite structure. The phonon calculation is done in ASE using VASP calculator.
 
 from pathlib import Path
 import pickle
+import argparse
 
 from ase.lattice.hexagonal import Graphite
 from ase.calculators.vasp import Vasp
 from ase.phonons import Phonons
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--correction", action="store_true")
+args = parser.parse_args()
 
 FILE_DIR = Path(__file__).parent
 NCELL = 5
@@ -65,6 +70,10 @@ energies = bs.energies
 # Convert to THz
 conversion = 4.136e-3  # 1 Thz = 4.136 meV
 energies /= conversion
+
+if args.correction:
+    # The energy seems to off by cube-root of the volume
+    energies /= atoms.get_volume() ** (1 / 3)
 
 labels = list(bs.get_labels())
 labels[2] = [r"$\Gamma$", r"$M$", r"$K$", r"$\Gamma$"]
