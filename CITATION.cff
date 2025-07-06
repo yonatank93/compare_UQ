@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+authors:
+- family-names: "Kurniawan"
+  given-names: "Yonatan"
+  orcid: "https://orcid.org/0000-0002-5369-5710"
+title: "Ensemble-based uncertainty quantification comparison for neural network interatomic potetial"
+version: 1.0.0
+date-released: 2025-07-05
+url: "https://github.com/yonatank93/compare_UQ"
