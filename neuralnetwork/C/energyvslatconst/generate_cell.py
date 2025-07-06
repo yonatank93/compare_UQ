@@ -164,7 +164,6 @@ def generate_unit_cell_graphite(a, c, unit="lattice"):
     # Lattice vectors
     v1 = np.array([np.sqrt(3), 0, 0])  # Aligned with x axis
     v2 = np.array([0, 1, 0])  # Aligned with y axis
-    # Make sure the atoms are not interacting across periodic boundary in z direction
     v3 = np.array([0, 0, c / a])  # ALigned with z axis
     cell = np.column_stack((v1, v2, v3))
 
@@ -174,7 +173,11 @@ def generate_unit_cell_graphite(a, c, unit="lattice"):
     a2 = np.array([1 / 3, 0, 0])
     a3 = np.array([0.5, 0.5, 0])
     a4 = np.array([5 / 6, 0.5, 0])
-    pos = np.row_stack((a1, a2, a3, a4))
+    a5 = np.array([1 / 6, 0.5, 0.5])
+    a6 = np.array([1 / 3, 0, 0.5])
+    a7 = np.array([2 / 3, 0, 0.5])
+    a8 = np.array([5 / 6, 0.5, 0.5])
+    pos = np.vstack((a1, a2, a3, a4, a5, a6, a7, a8))
 
     # Angstrom unit
     if unit.lower() == "angstrom":

@@ -11,13 +11,15 @@ kim init	{{ potential }} metal
 boundary	p p p
 # create a honeycomb lattice
 variable	a0 equal {{ a }}
-variable	c0 equal 3.348
+variable	c0 equal 6.7
 variable	coa equal ${c0}/${a0}
 lattice		custom ${a0} a1 1.0 0.0 0.0 &
-			  a2 0.5 $(sqrt(3.0)/2.0) 0.0 &
+			  a2 -0.5 $(sqrt(3.0)/2.0) 0.0 &
 			  a3 0.0 0.0 ${coa} &
 			  basis 0.0 0.0 0.0 &
-			  basis $(1.0/3.0) $(1.0/3.0) 0.0 &
+			  basis $(1.0/3.0) $(2.0/3.0) 0.0 &
+			  basis $(1.0/3.0) $(2.0/3.0) 0.5 &
+			  basis $(2.0/3.0) $(1.0/3.0) 0.5 &
 			  spacing 1.0 $(sqrt(3.0)/2.0) ${coa}
 # create simulation box and atoms
 region		reg prism 0 1 0 1 0 1 0.5 0 0 units lattice

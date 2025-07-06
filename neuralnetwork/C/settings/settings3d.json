@@ -1,0 +1,29 @@
+{
+    "dataset": {
+        "dataset_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/carbon_training_set",
+        "fingerprints_path": "/home/yonatank/nobackup/autodelete/compare_UQ/neuralnetwork/C/data/mingjian_partition_data/fingerprints"
+    },
+    "architecture": {
+        "Nlayers": 4,
+        "Nnodes": [
+            128,
+            128,
+            128
+        ],
+        "dropout_ratio": 0.4
+    },
+    "optimizer": {
+        "batch_size": [
+            100,
+            100
+        ],
+        "learning_rate": [
+            0.001,
+            0.0001
+        ],
+        "nepochs": [
+            5000,
+            40000
+        ]
+    }
+}

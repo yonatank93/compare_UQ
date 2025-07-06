@@ -49,6 +49,7 @@ log.lammps
 lammps.in
 
 # Slurm output files
+slurm-*.out
 slurm_files/
 
 # Large data
@@ -60,3 +61,37 @@ neuralnetwork/C/data/*_partition_data/*.json
 neuralnetwork/C/data/*_partition_data/DUNN_best*
 neuralnetwork/C/data/*_partition_data/carbon_*_set
 neuralnetwork/C/data/yonatan_partition_data/carbon_energies_forces
+
+# VASP files
+CHG
+CHGCAR
+CONTCAR
+DOSCAR
+EIGENVAL
+IBZKPT
+INCAR
+KPOINTS
+OSZICAR
+OUTCAR
+PCDAT
+POSCAR
+POTCAR
+REPORT
+WAVECAR
+XDATCAR
+ase-sort.dat
+vasp.out
+vaspout.h5
+vasprun.xml
+
+# Fingerprints files
+fingerprints*
+
+# Archived files
+*.tar.gz
+
+# Phonon calculation cache
+cache*
+
+# Unfinished work
+quests
